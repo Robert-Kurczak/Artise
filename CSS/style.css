@@ -1,0 +1,110 @@
+@font-face {
+    font-family: "Share Tech Mono";
+    src: url(ShareTechMono-Regular.ttf) format("truetype");
+}
+
+*{
+    font-family: "Share Tech Mono", monospace;
+    color: #E2EBFA;
+}
+
+body{
+    background-color: #141414;
+    overflow: hidden;
+    margin: 0;
+}
+
+/*-------------Upper panel------------*/
+#upper_panel{
+    height: 30px;
+    width: 100%;
+    background: #212121;
+    box-shadow: 0px 0px 15px 2px black;
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 3;
+}
+
+.menu{
+    position: absolute;
+    background-color: #212121;
+    width: 6%;
+    height: auto;
+    z-index: 2;
+    box-shadow: 0px 0px 15px 2px black;
+}
+
+#file_menu_button{
+    width: 6%;
+    height: 100%;
+    background: #212121;
+    border: none;
+    float: left;
+    cursor: pointer;
+    transition-duration: 0.3s;
+    font-size: 100%;
+}
+
+#file_menu_button:hover{
+    background-color: #141414;
+}
+
+.menu > button{
+    width: 100%;
+    height: 35px;
+    background-color: #212121;
+    border: none;
+    font-size: 95%;
+    cursor: pointer;
+    transition-duration: 0.3s;
+}
+
+.menu > button:hover{
+    background-color: #141414;
+}
+
+/*-------------Number input------------*/
+#settings{
+    width: 30%;
+    height: 150px;
+    text-align: center;
+    padding-top: 1%;
+}
+
+#settings p{
+    display: inline-block;
+    margin-right: 2%;
+}
+
+#settings input[type = "number"]{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 15%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
+}
+
+#settings input[type = "number"]::-webkit-outer-spin-button,
+#settings input[type = "number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+canvas{
+    background-color: white;
+}
+
+#preview{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    top: 50%;
+    transform: translateY(-50%);
+}

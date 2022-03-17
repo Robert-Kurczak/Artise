@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="CSS/style.css">
+
+    <script src="JS/jquery-3.6.0.min.js"></script>
+
+    <title>Graphic Editor</title>
+</head>
+
+    <body>
+        <div id="upper_panel">
+            <button class="menu_item" id="file_menu_button" onclick="toggleFileMenu()">File</button>
+        </div>
+
+        <div class="menu" id="file_menu">
+            <button class="menu_item" onclick="toggleSettings()">New</button>
+            <div class="UI_hr_stripe menu_item"></div>
+            <button class="menu_item" onclick="">Load</button>
+        </div>
+
+        <div class="menu" id="settings">
+            <p>Width</p><input type="number" min="1" id="resolutionX" value="1">
+            <br>
+            <p>Height</p><input type="number" min="1" id="resolutionY" value="1">
+            <br>
+            <br>
+            <button class="menu_item" onclick="createDocument()">Create</button>
+        </div>
+
+        <div id="preview">
+        </div>
+
+        <script src="JS/main.js"></script>
+    </body>
+</html>

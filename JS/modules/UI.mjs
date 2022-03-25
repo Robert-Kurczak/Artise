@@ -4,9 +4,11 @@ export class UI{
     //---Upper panel---
     static menuSlideTime = 150;
 
-    static fileMenu = $("#file_menu");
-    static saveMenu = $("#save_menu");
-    static loadMenu = $("#load_menu");
+    static fileTab = $("#file_tab");
+    static editTab = $("#edit_tab");
+
+    static saveTab = $("#save_tab");
+    static loadTab = $("#load_tab");
 
     static documentCreator = $("#document_creator");
     static canvasHolder = $("#canvas_holder");
@@ -18,49 +20,65 @@ export class UI{
     }
     //------
 
-    //---Menus---
-    static toggleFileMenu(){
-        this.fileMenu.slideToggle(this.menuSlideTime);
+    //---Tabs---
+    static toggleFileTab(){
+        this.fileTab.slideToggle(this.menuSlideTime);
 
-        if(this.loadMenu.is(":visible")){
-            this.loadMenu.slideToggle(this.menuSlideTime);
+        if(this.loadTab.is(":visible")){
+            this.loadTab.slideToggle(this.menuSlideTime);
         }
 
-        if(this.saveMenu.is(":visible")){
-            this.saveMenu.slideToggle(this.menuSlideTime);
-        }
-    }
-
-    static toggleSaveMenu(){
-        this.saveMenu.slideToggle(this.menuSlideTime);
-
-        if(this.loadMenu.is(":visible")){
-            this.loadMenu.hide();
+        if(this.saveTab.is(":visible")){
+            this.saveTab.slideToggle(this.menuSlideTime);
         }
     }
 
-    static toggleLoadMenu(){
-        this.loadMenu.slideToggle();
+    static toggleSaveTab(){
+        this.saveTab.slideToggle(this.menuSlideTime);
 
-        if(this.saveMenu.is(":visible")){
-            this.saveMenu.hide();
+        if(this.loadTab.is(":visible")){
+            this.loadTab.hide();
         }
     }
 
-    static hideAllMenus(){
-        if(this.fileMenu.is(":visible")){
-            this.fileMenu.slideToggle(this.menuSlideTime);
+    static toggleLoadTab(){
+        this.loadTab.slideToggle();
+
+        if(this.saveTab.is(":visible")){
+            this.saveTab.hide();
+        }
+    }
+
+    static hideAllTabs(){
+        if(this.fileTab.is(":visible")){
+            this.fileTab.slideToggle(this.menuSlideTime);
         }
 
-        if(this.saveMenu.is(":visible")){
-            this.saveMenu.slideToggle(this.menuSlideTime);
+        if(this.editTab.is(":visible")){
+            this.editTab.slideToggle(this.menuSlideTime);
         }
 
-        if(this.loadMenu.is(":visible")){
-            this.loadMenu.slideToggle(this.menuSlideTime);
+        if(this.saveTab.is(":visible")){
+            this.saveTab.slideToggle(this.menuSlideTime);
+        }
+
+        if(this.loadTab.is(":visible")){
+            this.loadTab.slideToggle(this.menuSlideTime);
         }
 
         this.documentCreator.hide();
+    }
+
+    static toggleEditTab(){
+        this.editTab.slideToggle(this.menuSlideTime);
+
+        // if(this.loadTab.is(":visible")){
+        //     this.loadTab.slideToggle(this.menuSlideTime);
+        // }
+
+        // if(this.saveTab.is(":visible")){
+        //     this.saveTab.slideToggle(this.menuSlideTime);
+        // }
     }
     //------
 

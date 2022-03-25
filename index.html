@@ -15,37 +15,41 @@
 
     <body>
         <div class="panel" id="upper_panel">
-            <button class="menu_item tab_label" id="file_menu_button" onclick="UI.toggleFileMenu()">File</button>
-            <button class="menu_item tab_label" id="edit_menu_button" onclick="UI.toggleEditMenu()">Edit</button>
-        </div>
 
-        <!-- File menu -->
-        <div class="menu" id="file_menu">
-            <button class="menu_item" onclick="UI.showDocumentCreator()">New</button>
-            <div class="UI_hr_stripe"></div>
-            <button class="menu_item" onclick="UI.toggleSaveMenu()">Save</button>
-            <div class="UI_hr_stripe"></div>
-            <button class="menu_item" onclick="UI.toggleLoadMenu()">Load</button>
-        </div>
+            <!-- File tab -->
+            <div class="dropdown_tab">
+                <button class="tab_item tab_label" onclick="UI.toggleFileTab()">File</button>
 
-        <div class="menu" id="save_menu">
-            <button class="menu_item" onclick="saveToBrowser();">Save to browser</button>
-            <div class="UI_hr_stripe"></div>
-            <button class="menu_item" onclick="saveToJSON();">Save JSON</button>
-        </div>
+                <div class="tab" id="file_tab">
+                    <button class="tab_item" onclick="UI.showDocumentCreator()">New</button>
+                    <div class="UI_hr_stripe"></div>
+                    <button class="tab_item" onclick="UI.toggleSaveTab()">Save</button>
+                    <div class="UI_hr_stripe"></div>
+                    <button class="tab_item" onclick="UI.toggleLoadTab()">Load</button>
+                </div>
 
-        <div class="menu" id="load_menu">
-            <button class="menu_item" onclick="loadFromBrowser();">Load from browser</button>
-            <div class="UI_hr_stripe"></div>
-            <button class="menu_item" onclick="loadFromJSON();">Load from JSON</button>
-        </div>
-        <!-------------->
+                <div class="tab" id="save_tab">
+                    <button class="tab_item" onclick="saveToBrowser();">Save to browser</button>
+                    <div class="UI_hr_stripe"></div>
+                    <button class="tab_item" onclick="saveToJSON();">Save JSON</button>
+                </div>
 
-        <!-- Edit menu -->
-        <div class="menu" id="edit_menu">
-            <button class="menu_item" onclick="">Resize</button>
+                <div class="tab" id="load_tab">
+                    <button class="tab_item" onclick="loadFromBrowser();">Load from browser</button>
+                    <div class="UI_hr_stripe"></div>
+                    <button class="tab_item" onclick="loadFromJSON();">Load from JSON</button>
+                </div>
+            </div>
+
+            <!-- Edit tab -->
+            <div class="dropdown_tab">
+                <button class="tab_item tab_label" onclick="UI.toggleEditTab()">Edit</button>
+                
+                <div class="tab" id="edit_tab">
+                    <button class="tab_item" onclick="">Resize</button>
+                </div>
+            </div>
         </div>
-        <!--------------->
 
         <form class="panel" id="document_creator">
             <p>Width</p><input name="resolutionX" type="number" min="1" value="512">
@@ -54,8 +58,8 @@
             <br>
             <br>
             <div class="UI_hr_stripe"></div>
-            <button type="reset" class="menu_item" onclick="UI.hideDocumentCreator()">Cancel</button>
-            <button type="button" class="menu_item" onclick="UI.createCanvas()">Create</button>
+            <button type="reset" class="tab_item" onclick="UI.hideDocumentCreator()">Cancel</button>
+            <button type="button" class="tab_item" onclick="UI.createCanvas()">Create</button>
         </form>
 
         <div id="canvas_holder">

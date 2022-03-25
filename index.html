@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
 
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/UI.css">
+
+    <script type="module" src="JS/modules/main.mjs"></script>
 
     <script src="JS/jquery-3.6.0.min.js"></script>
 
@@ -11,28 +14,52 @@
 </head>
 
     <body>
-        <div id="upper_panel">
-            <button class="menu_item" id="file_menu_button" onclick="toggleFileMenu()">File</button>
+        <div class="panel" id="upper_panel">
+            <button class="menu_item tab_label" id="file_menu_button" onclick="UI.toggleFileMenu()">File</button>
+            <button class="menu_item tab_label" id="edit_menu_button" onclick="UI.toggleEditMenu()">Edit</button>
         </div>
 
+        <!-- File menu -->
         <div class="menu" id="file_menu">
-            <button class="menu_item" onclick="toggleSettings()">New</button>
-            <div class="UI_hr_stripe menu_item"></div>
-            <button class="menu_item" onclick="">Load</button>
+            <button class="menu_item" onclick="UI.showDocumentCreator()">New</button>
+            <div class="UI_hr_stripe"></div>
+            <button class="menu_item" onclick="UI.toggleSaveMenu()">Save</button>
+            <div class="UI_hr_stripe"></div>
+            <button class="menu_item" onclick="UI.toggleLoadMenu()">Load</button>
         </div>
 
-        <div class="menu" id="settings">
-            <p>Width</p><input type="number" min="1" id="resolutionX" value="1">
-            <br>
-            <p>Height</p><input type="number" min="1" id="resolutionY" value="1">
-            <br>
-            <br>
-            <button class="menu_item" onclick="createDocument()">Create</button>
+        <div class="menu" id="save_menu">
+            <button class="menu_item" onclick="saveToBrowser();">Save to browser</button>
+            <div class="UI_hr_stripe"></div>
+            <button class="menu_item" onclick="saveToJSON();">Save JSON</button>
         </div>
 
-        <div id="preview">
+        <div class="menu" id="load_menu">
+            <button class="menu_item" onclick="loadFromBrowser();">Load from browser</button>
+            <div class="UI_hr_stripe"></div>
+            <button class="menu_item" onclick="loadFromJSON();">Load from JSON</button>
+        </div>
+        <!-------------->
+
+        <!-- Edit menu -->
+        <div class="menu" id="edit_menu">
+            <button class="menu_item" onclick="">Resize</button>
+        </div>
+        <!--------------->
+
+        <form class="panel" id="document_creator">
+            <p>Width</p><input name="resolutionX" type="number" min="1" value="512">
+            <br>
+            <p>Height</p><input name="resolutionY" type="number" min="1" value="512">
+            <br>
+            <br>
+            <div class="UI_hr_stripe"></div>
+            <button type="reset" class="menu_item" onclick="UI.hideDocumentCreator()">Cancel</button>
+            <button type="button" class="menu_item" onclick="UI.createCanvas()">Create</button>
+        </form>
+
+        <div id="canvas_holder">
         </div>
 
-        <script src="JS/main.js"></script>
     </body>
 </html>

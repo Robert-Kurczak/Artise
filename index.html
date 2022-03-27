@@ -5,10 +5,16 @@
 
     <link rel="stylesheet" href="CSS/style.css">
     <link rel="stylesheet" href="CSS/UI.css">
+    <link rel="stylesheet" href="CSS/icons.css">
+
+    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"> -->
+
 
     <script type="module" src="JS/modules/main.mjs"></script>
 
     <script src="JS/jquery-3.6.0.min.js"></script>
+    <script src="JS/fabric.min.js"></script>
 
     <title>Graphic Editor</title>
 </head>
@@ -18,14 +24,14 @@
 
             <!-- File tab -->
             <div class="dropdown_tab">
-                <button class="tab_item tab_label" onclick="UI.toggleFileTab()">File</button>
+                <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.fileTab)">File</button>
 
                 <div class="tab" id="file_tab">
                     <button class="tab_item" onclick="UI.showDocumentCreator()">New</button>
                     <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="UI.toggleSaveTab()">Save</button>
+                    <button class="tab_item" onclick="UI.toggleTab(UI.tabs.saveTab)">Save</button>
                     <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="UI.toggleLoadTab()">Load</button>
+                    <button class="tab_item" onclick="UI.toggleTab(UI.tabs.loadTab)">Load</button>
                 </div>
 
                 <div class="tab" id="save_tab">
@@ -37,33 +43,40 @@
                 <div class="tab" id="load_tab">
                     <button class="tab_item" onclick="loadFromBrowser();">Load from browser</button>
                     <div class="UI_hr_stripe"></div>
+                    <button class="tab_item" onclick="loadPNG();">Load PNG</button>
+                    <div class="UI_hr_stripe"></div>
                     <button class="tab_item" onclick="loadFromJSON();">Load from JSON</button>
                 </div>
             </div>
 
             <!-- Edit tab -->
             <div class="dropdown_tab">
-                <button class="tab_item tab_label" onclick="UI.toggleEditTab()">Edit</button>
+                <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.editTab)">Edit</button>
                 
                 <div class="tab" id="edit_tab">
-                    <button class="tab_item" onclick="">Resize</button>
+                    <button class="tab_item" onclick="UI.showDocumentCreator('resize')">Resize</button>
                 </div>
             </div>
         </div>
 
-        <form class="panel" id="document_creator">
-            <p>Width</p><input name="resolutionX" type="number" min="1" value="512">
-            <br>
-            <p>Height</p><input name="resolutionY" type="number" min="1" value="512">
-            <br>
-            <br>
-            <div class="UI_hr_stripe"></div>
-            <button type="reset" class="tab_item" onclick="UI.hideDocumentCreator()">Cancel</button>
-            <button type="button" class="tab_item" onclick="UI.createCanvas()">Create</button>
-        </form>
+        <div class="panel" id="tools_panel">
+            <div id="tools_grid">
+                <span class="material-icons-outlined">highlight_alt</span>
+                <span class="material-icons-outlined">pinch</span>
+                <span class="material-icons-outlined">colorize</span>
+                <span class="material-icons-outlined">title</span>
+                <span class="material-icons-outlined">brush</span>
+                <span class="material-icons-outlined">format_color_fill</span>
+                <span class="material-icons-outlined">gradient</span>
+                <span class="material-icons-outlined">rectangle</span>
+            </div>
 
-        <div id="canvas_holder">
+            <div class="UI_hr_stripe"></div>
+
+            <div id="color_picker"></div>
         </div>
+
+        <div id="document_creator_holder"></div>
 
     </body>
 </html>

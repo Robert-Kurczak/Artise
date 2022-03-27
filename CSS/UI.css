@@ -92,15 +92,48 @@
   margin: 0;
 }
 /*--------------------------------------------*/
-canvas{
-    background-color: white;
+
+/*-------------------Panels-------------------*/
+#tools_panel{
+    display: inline-block;
+    padding: 5px;
+    position: absolute;
+    top: 25%;
 }
 
-#canvas_holder{
-    position: absolute;
-    width: 100%;
+#tools_grid{
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    grid-template-rows: repeat(auto, 40px);
+}
+
+#tools_grid span{
+    line-height: 40px;
     text-align: center;
-    white-space: nowrap;
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+#tools_grid span:hover{
+    background-color: #141414;
+}
+
+#color_picker{
+    width: 60%;
+    height: 35px;
+    margin: 30% auto 10% auto;
+    background-color: white;
+    cursor: pointer;
+}
+/*--------------------------------------------*/
+
+canvas{
+    border: 2px solid white;
+}
+
+.canvas-container{
+    position: absolute !important;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

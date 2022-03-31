@@ -11,10 +11,8 @@ export class UI{
         editTab: $("#edit_tab")
     };
 
-    //Holder to keep track of current tab
-    //If tab that is not direct child of tracked tab is opened
-    //all tab needs to be hidden
-    static activeTab;
+    static activeTabs = [];
+    static lastNestLevel = -1;
 
     static documentCreatorHolder = $("#document_creator_holder");
     static colorPreview = $("#color_preview");
@@ -27,11 +25,43 @@ export class UI{
     //------
 
     //---Tabs---
-    static toggleTab(tab){
-        $(tab).slideToggle(this.menuSlideTime);
+    static toggleTab(tab, nestLevel){
+        //Simply closing tab
+        if($(tab).is(":visible")){
+            $(tab).slideToggle(this.menuSlideTime);
 
+            this.lastNestLevel--;
+            this.activeTabs.splice(nestLevel, 1);
+
+            return
+        }
+
+        //No tabs opened or opening in order
+        if((this.lastNestLevel == -1) || (this.lastNestLevel == nestLevel - 1)){
+            $(tab).slideToggle(this.menuSlideTime);
+
+            this.activeTabs.push(tab);
+            this.lastNestLevel++;
+
+            return;
+        }
+
+        //Opening tabs not in order
+        //Hiding tabs
+        for(let i = nestLevel; i <= this.lastNestLevel; i++){
+            
+            $(this.activeTabs[i]).hide();
+        }
+
+        //Clearing array
+        this.activeTabs.splice(nestLevel, this.lastNestLevel);
+
+        //Showing proper tab and pushing its node to array
+        $(tab).slideToggle(this.menuSlideTime);
         this.activeTabs.push(tab);
-        
+
+        //Update nestLevel
+        this.lastNestLevel = nestLevel;
         
     }
 
@@ -39,7 +69,7 @@ export class UI{
         
     }
 
-    static hideAllTabs(exception){
+    static hideAllTabs(){
         for(let t in this.tabs){
             if($(this.tabs[t]).is(":visible")){
                 $(this.tabs[t]).slideToggle();

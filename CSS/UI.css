@@ -18,29 +18,32 @@
 } */
 
 /*-------------------Tabs---------------------*/
-.dropdown_tab{
-    float: left;
-    overflow: hidden;
+.nested_tab{
+    overflow: inherit;
+    position: relative;
 }
 
 .tab{
     width: 6%;
     position: absolute;
     z-index: 2;
-}
-
-.tab_label{
-    padding: 0px 30px;
+    overflow: initial;
 }
 
 .tab_item{
     width: 100%;
-    height: 35px;
+    height: 30px;
     background-color: #212121;
     border: none;
-    font-size: 95%;
+    font-size: 75%;
     cursor: pointer;
     transition-duration: 0.3s;
+}
+
+.tab_label{
+    padding: 10px 10px;
+    width: auto;
+    height: auto;
 }
 
 .tab_item:hover{
@@ -48,8 +51,9 @@
 }
 
 #save_tab, #load_tab{
-    left: 6%;
-    width: 10%;
+    left: 100%;
+    width: 175%;
+    top: 0px;
 }
 /*-------------document creator------------*/
 #document_creator{

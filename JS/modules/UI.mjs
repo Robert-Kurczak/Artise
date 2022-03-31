@@ -11,6 +11,11 @@ export class UI{
         editTab: $("#edit_tab")
     };
 
+    //Holder to keep track of current tab
+    //If tab that is not direct child of tracked tab is opened
+    //all tab needs to be hidden
+    static activeTab;
+
     static documentCreatorHolder = $("#document_creator_holder");
     static colorPreview = $("#color_preview");
 
@@ -22,15 +27,19 @@ export class UI{
     //------
 
     //---Tabs---
-    static toggleTab(tab, tabToHide = null){
+    static toggleTab(tab){
         $(tab).slideToggle(this.menuSlideTime);
 
-        if(tabToHide != null){
-            $(tabToHide).hide();
-        }
+        this.activeTabs.push(tab);
+        
+        
     }
 
-    static hideAllTabs(){
+    static hideActiveTabs(){
+        
+    }
+
+    static hideAllTabs(exception){
         for(let t in this.tabs){
             if($(this.tabs[t]).is(":visible")){
                 $(this.tabs[t]).slideToggle();
@@ -136,12 +145,10 @@ export class UI{
 }
 
 //---UI initialization---
-
 UI.hideAllTabs();
 
 UI.pickr.on("change", (color) => {
     UI.colorPreview.css("background-color", color.toRGBA().toString(3));
 
 });
-
 //------

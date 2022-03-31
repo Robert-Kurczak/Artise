@@ -8,7 +8,8 @@ export class UI{
         fileTab: $("#file_tab"),
         saveTab: $("#save_tab"),
         loadTab: $("#load_tab"),
-        editTab: $("#edit_tab")
+        editTab: $("#edit_tab"),
+        testNode: $("#test_node")
     };
 
     static activeTabs = [];
@@ -27,7 +28,7 @@ export class UI{
     //---Tabs---
     static toggleTab(tab, nestLevel){
         //Simply closing tab
-        if($(tab).is(":visible")){
+        if(tab.is(":visible")){
             $(tab).slideToggle(this.menuSlideTime);
 
             this.lastNestLevel--;
@@ -49,24 +50,26 @@ export class UI{
         //Opening tabs not in order
         //Hiding tabs
         for(let i = nestLevel; i <= this.lastNestLevel; i++){
-            
-            $(this.activeTabs[i]).hide();
+            this.activeTabs[i].hide();
         }
 
         //Clearing array
-        this.activeTabs.splice(nestLevel, this.lastNestLevel);
+        this.activeTabs.splice(nestLevel, this.lastNestLevel + 1);
 
         //Showing proper tab and pushing its node to array
-        $(tab).slideToggle(this.menuSlideTime);
+        tab.slideToggle(this.menuSlideTime);
         this.activeTabs.push(tab);
 
         //Update nestLevel
         this.lastNestLevel = nestLevel;
-        
     }
 
     static hideActiveTabs(){
-        
+        for(tab of this.activeTabs){
+            tab.hide();
+        }
+
+        this.activeTabs = [];
     }
 
     static hideAllTabs(){

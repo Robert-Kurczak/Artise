@@ -18,9 +18,13 @@
 } */
 
 /*-------------------Tabs---------------------*/
-.nested_tab{
+.nested_tab_wrapper{
     overflow: inherit;
     position: relative;
+}
+
+.root_tab_wrapper{
+    display: inline-block;
 }
 
 .tab{
@@ -50,7 +54,7 @@
     background-color: #141414;
 }
 
-#save_tab, #load_tab{
+.nested_tab{
     left: 100%;
     width: 175%;
     top: 0px;

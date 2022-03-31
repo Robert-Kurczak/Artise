@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
 
+    <link rel="stylesheet" href="CSS/monolith.min.css"/>
     <link rel="stylesheet" href="CSS/style.css">
     <link rel="stylesheet" href="CSS/UI.css">
     <link rel="stylesheet" href="CSS/icons.css">
-
-    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"> -->
-
+    
 
     <script type="module" src="JS/modules/main.mjs"></script>
 
     <script src="JS/jquery-3.6.0.min.js"></script>
     <script src="JS/fabric.min.js"></script>
+    <script src="JS/pickr.min.js"></script>
 
     <title>Graphic Editor</title>
 </head>
@@ -26,7 +25,7 @@
             <div class="dropdown_tab">
                 <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.fileTab)">File</button>
 
-                <div class="tab" id="file_tab">
+                <div class="panel tab" id="file_tab">
                     <button class="tab_item" onclick="UI.showDocumentCreator()">New</button>
                     <div class="UI_hr_stripe"></div>
                     <button class="tab_item" onclick="UI.toggleTab(UI.tabs.saveTab)">Save</button>
@@ -34,13 +33,13 @@
                     <button class="tab_item" onclick="UI.toggleTab(UI.tabs.loadTab)">Load</button>
                 </div>
 
-                <div class="tab" id="save_tab">
+                <div class="panel tab" id="save_tab">
                     <button class="tab_item" onclick="saveToBrowser();">Save to browser</button>
                     <div class="UI_hr_stripe"></div>
                     <button class="tab_item" onclick="saveToJSON();">Save JSON</button>
                 </div>
 
-                <div class="tab" id="load_tab">
+                <div class="panel tab" id="load_tab">
                     <button class="tab_item" onclick="loadFromBrowser();">Load from browser</button>
                     <div class="UI_hr_stripe"></div>
                     <button class="tab_item" onclick="loadPNG();">Load PNG</button>
@@ -53,7 +52,7 @@
             <div class="dropdown_tab">
                 <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.editTab)">Edit</button>
                 
-                <div class="tab" id="edit_tab">
+                <div class="panel tab" id="edit_tab">
                     <button class="tab_item" onclick="UI.showDocumentCreator('resize')">Resize</button>
                 </div>
             </div>
@@ -73,8 +72,10 @@
 
             <div class="UI_hr_stripe"></div>
 
-            <div id="color_picker"></div>
+            <div id="color_preview"></div>
         </div>
+
+        <!-- <div id="color_picker"></div> -->
 
         <div id="document_creator_holder"></div>
 

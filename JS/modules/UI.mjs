@@ -12,6 +12,7 @@ export class UI{
     };
 
     static documentCreatorHolder = $("#document_creator_holder");
+    static colorPreview = $("#color_preview");
 
     static saveStatus = $("#save_status");
 
@@ -93,4 +94,54 @@ export class UI{
 
         this.hideAllTabs();
     }
+    
+    static pickr = Pickr.create({
+        el: '#color_preview',
+        theme: 'monolith',
+        useAsButton: true,
+        appClass: "color_picker_custom",
+        default: "#ffffff",
+    
+        swatches: [
+            'rgba(244, 67, 54, 1)',
+            'rgba(233, 30, 99, 0.95)',
+            'rgba(156, 39, 176, 0.9)',
+            'rgba(103, 58, 183, 0.85)',
+            'rgba(63, 81, 181, 0.8)',
+            'rgba(33, 150, 243, 0.75)',
+            'rgba(3, 169, 244, 0.7)',
+            'rgba(0, 188, 212, 0.7)'
+        ],
+    
+        components: {
+    
+            // Main components
+            hue: true,
+            hsv: true,
+            opacity: true,
+            
+    
+            // Input / output Options
+            interaction: {
+                hex: true,
+                rgba: true,
+                hsla: true,
+                hsva: true,
+                cmyk: true,
+                input: true,
+            }
+        }
+    });
+    
 }
+
+//---UI initialization---
+
+UI.hideAllTabs();
+
+UI.pickr.on("change", (color) => {
+    UI.colorPreview.css("background-color", color.toRGBA().toString(3));
+
+});
+
+//------

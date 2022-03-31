@@ -46,5 +46,7 @@ window.loadPNG = () => {
 }
 
 //---Initialization---
-UI.hideAllTabs();
+
+
+
 //------

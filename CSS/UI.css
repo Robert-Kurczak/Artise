@@ -1,4 +1,4 @@
-.panel, .tab{
+.panel{
     background-color: #212121;
     box-shadow: 0px 0px 15px 2px black;
     overflow: hidden;
@@ -55,13 +55,13 @@
 #document_creator{
     width: 30%;
     height: auto;
+    position: absolute;
     top: 35%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     padding-top: 1%;
     z-index: 2;
-    position: absolute;
 }
 
 #document_creator .tab_item{
@@ -99,6 +99,7 @@
     padding: 5px;
     position: absolute;
     top: 25%;
+    overflow: initial;
 }
 
 #tools_grid{
@@ -118,12 +119,25 @@
     background-color: #141414;
 }
 
-#color_picker{
+#color_preview{
     width: 60%;
     height: 35px;
     margin: 30% auto 10% auto;
     background-color: white;
     cursor: pointer;
+}
+
+.color_picker_custom{
+    position: absolute;
+    left: 90px !important;
+    top: 25% !important;
+    background-color: #212121;
+    
+}
+
+.color_picker_custom .pcr-interaction .pcr-result{
+    text-align: center;
+    flex: 1 1 16em;
 }
 /*--------------------------------------------*/
 

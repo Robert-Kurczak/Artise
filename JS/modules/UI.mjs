@@ -11,10 +11,14 @@ export class UI{
         editTab: $("#edit_tab")
     };
 
+    static activeTabs = [];
+    static lastNestLevel = -1;
+
     static documentCreatorHolder = $("#document_creator_holder");
+    static selectedToolPrev = $("#selected_tool_preview");
     static colorPreview = $("#color_preview");
 
-    static saveStatus = $("#save_status");
+    static toolSettingPanel = $("#tool_setting_panel");
 
     static get canvasDimensions(){
         return canvasDimensions;
@@ -22,12 +26,50 @@ export class UI{
     //------
 
     //---Tabs---
-    static toggleTab(tab, tabToHide = null){
-        $(tab).slideToggle(this.menuSlideTime);
+    static toggleTab(tab, nestLevel){
+        //Simply closing tab
+        if(tab.is(":visible")){
+            $(tab).slideToggle(this.menuSlideTime);
 
-        if(tabToHide != null){
-            $(tabToHide).hide();
+            this.lastNestLevel--;
+            this.activeTabs.splice(nestLevel, 1);
+
+            return
         }
+
+        //No tabs opened or opening in order
+        if((this.lastNestLevel == -1) || (this.lastNestLevel == nestLevel - 1)){
+            $(tab).slideToggle(this.menuSlideTime);
+
+            this.activeTabs.push(tab);
+            this.lastNestLevel++;
+
+            return;
+        }
+
+        //Opening tabs not in order
+        //Hiding tabs
+        for(let i = nestLevel; i <= this.lastNestLevel; i++){
+            this.activeTabs[i].hide();
+        }
+
+        //Clearing array
+        this.activeTabs.splice(nestLevel, this.lastNestLevel + 1);
+
+        //Showing proper tab and pushing its node to array
+        tab.slideToggle(this.menuSlideTime);
+        this.activeTabs.push(tab);
+
+        //Update nestLevel
+        this.lastNestLevel = nestLevel;
+    }
+
+    static hideActiveTabs(){
+        for(let tab of this.activeTabs){
+            tab.hide();
+        }
+
+        this.activeTabs = [];
     }
 
     static hideAllTabs(){
@@ -79,7 +121,7 @@ export class UI{
         $(".canvas-container").remove();
     }
 
-    static createCanvas(){
+    static createCanvas(canvasID){
         const data = $("#document_creator").serializeArray();
         this.hideDocumentCreator();
 
@@ -88,13 +130,24 @@ export class UI{
 
         $("body").append(`
         
-            <canvas width="`+ canvasDimensions.x +`" height='`+ canvasDimensions.y +`' id="main_canvas"></canvas>
+            <canvas width="`+ canvasDimensions.x +`" height='`+ canvasDimensions.y +`' id="`+ canvasID +`"></canvas>
 
         `);
 
         this.hideAllTabs();
     }
     
+    static showToolSettings(tool){
+        switch(tool){
+            case "brush":
+                this.toolSettingPanel.html(`
+                    <p>Brush size: </p>
+                    <input type="number" min=1 value="1" onchange="updateBrushWidth(this.value)">
+                `);
+                break;
+        }
+    }
+
     static pickr = Pickr.create({
         el: '#color_preview',
         theme: 'monolith',
@@ -136,12 +189,5 @@ export class UI{
 }
 
 //---UI initialization---
-
 UI.hideAllTabs();
-
-UI.pickr.on("change", (color) => {
-    UI.colorPreview.css("background-color", color.toRGBA().toString(3));
-
-});
-
 //------

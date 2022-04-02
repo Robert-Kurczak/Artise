@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en_US">
 <head>
     <meta charset="UTF-8">
 
@@ -20,54 +20,66 @@
 
     <body>
         <div class="panel" id="upper_panel">
-
             <!-- File tab -->
-            <div class="dropdown_tab">
-                <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.fileTab)">File</button>
+			<div class="root_tab_wrapper">
+				<button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.fileTab, 0)">File</button>
+				<!-------------------Nest level: 0------------------->
+				<div class="panel tab" id="file_tab">
+					<button class="tab_item" onclick="UI.showDocumentCreator()">New</button>
 
-                <div class="panel tab" id="file_tab">
-                    <button class="tab_item" onclick="UI.showDocumentCreator()">New</button>
-                    <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="UI.toggleTab(UI.tabs.saveTab)">Save</button>
-                    <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="UI.toggleTab(UI.tabs.loadTab)">Load</button>
-                </div>
+					<div class="UI_hr_stripe"></div>
 
-                <div class="panel tab" id="save_tab">
-                    <button class="tab_item" onclick="saveToBrowser();">Save to browser</button>
-                    <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="saveToJSON();">Save JSON</button>
-                </div>
+					<div class="nested_tab_wrapper">
+						<button class="tab_item" onclick="UI.toggleTab(UI.tabs.saveTab, 1)">Save</button>
+						<!-- Nest level: 1 -->
+						<div class="panel tab nested_tab" id="save_tab">
+							<button class="tab_item" onclick="saveToBrowser();">Save to browser</button>
+							<div class="UI_hr_stripe"></div>
+							<button class="tab_item" onclick="saveToJSON();">Save JSON</button>
+						</div>
+						<!------------------->
+					</div>
 
-                <div class="panel tab" id="load_tab">
-                    <button class="tab_item" onclick="loadFromBrowser();">Load from browser</button>
-                    <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="loadPNG();">Load PNG</button>
-                    <div class="UI_hr_stripe"></div>
-                    <button class="tab_item" onclick="loadFromJSON();">Load from JSON</button>
-                </div>
-            </div>
+					<div class="UI_hr_stripe"></div>
+
+					<div class="nested_tab_wrapper" data-tab_label="load_tab">
+						<button class="tab_item" onclick="UI.toggleTab(UI.tabs.loadTab, 1)">Load</button>
+						<!-- Nest level: 1 -->
+						<div class="panel tab nested_tab" id="load_tab">
+							<button class="tab_item" onclick="loadFromBrowser();">Load from browser</button>
+							<div class="UI_hr_stripe"></div>
+							<button class="tab_item" onclick="loadPNG();">Load PNG</button>
+							<div class="UI_hr_stripe"></div>
+							<button class="tab_item" onclick="loadFromJSON();">Load from JSON</button>
+						</div>
+						<!------------------->
+					</div>
+				</div>
+			</div>
+			<!--------------------------------------------------->
 
             <!-- Edit tab -->
-            <div class="dropdown_tab">
-                <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.editTab)">Edit</button>
-                
-                <div class="panel tab" id="edit_tab">
-                    <button class="tab_item" onclick="UI.showDocumentCreator('resize')">Resize</button>
-                </div>
-            </div>
+			<div class="root_tab_wrapper">
+				<button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.editTab, 0)">Edit</button>
+				<!-------------------Nest level: 0------------------->
+				<div class="panel tab" id="edit_tab">
+					<button class="tab_item" onclick="UI.showDocumentCreator('resize')">Resize</button>
+				</div>
+			</div>
+			<!--------------------------------------------------->
+			<span id="selected_tool_preview" class="material-icons-outlined"></span>
         </div>
 
         <div class="panel" id="tools_panel">
             <div id="tools_grid">
-                <span class="material-icons-outlined">highlight_alt</span>
-                <span class="material-icons-outlined">pinch</span>
-                <span class="material-icons-outlined">colorize</span>
-                <span class="material-icons-outlined">title</span>
-                <span class="material-icons-outlined">brush</span>
-                <span class="material-icons-outlined">format_color_fill</span>
-                <span class="material-icons-outlined">gradient</span>
-                <span class="material-icons-outlined">rectangle</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="select">highlight_alt</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="move">pinch</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="eyedropper">colorize</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="text">title</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="brush">brush</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="fill">format_color_fill</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="gradient">gradient</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="shape">rectangle</span>
             </div>
 
             <div class="UI_hr_stripe"></div>
@@ -75,9 +87,11 @@
             <div id="color_preview"></div>
         </div>
 
-        <!-- <div id="color_picker"></div> -->
+		<div class="panel settings" id="right_panel">
+			<div id="tool_setting_panel"></div>
+			<div id="layer_panel"></div>
+		</div>
 
         <div id="document_creator_holder"></div>
-
     </body>
 </html>

@@ -18,38 +18,52 @@
 } */
 
 /*-------------------Tabs---------------------*/
-.dropdown_tab{
-    float: left;
-    overflow: hidden;
+.nested_tab_wrapper{
+    overflow: inherit;
+    position: relative;
+}
+
+.root_tab_wrapper{
+    display: inline-block;
 }
 
 .tab{
     width: 6%;
     position: absolute;
     z-index: 2;
-}
-
-.tab_label{
-    padding: 0px 30px;
+    overflow: initial;
 }
 
 .tab_item{
     width: 100%;
-    height: 35px;
+    height: 30px;
     background-color: #212121;
     border: none;
-    font-size: 95%;
+    font-size: 75%;
     cursor: pointer;
     transition-duration: 0.3s;
+}
+
+.tab_label{
+    padding: 10px 10px;
+    width: auto;
+    height: auto;
 }
 
 .tab_item:hover{
     background-color: #141414;
 }
 
-#save_tab, #load_tab{
-    left: 6%;
-    width: 10%;
+.nested_tab{
+    left: 100%;
+    width: 175%;
+    top: 0px;
+}
+
+#selected_tool_preview{
+    float: right;
+    margin-right: 3%;
+    padding-top: 4px;
 }
 /*-------------document creator------------*/
 #document_creator{
@@ -139,10 +153,33 @@
     text-align: center;
     flex: 1 1 16em;
 }
-/*--------------------------------------------*/
 
-canvas{
-    border: 2px solid white;
+#right_panel{
+    width: 15%;
+    padding: 15px;
+    position: absolute;
+    top: 25%;
+    right: 0;
+}
+
+#layer_panel{
+    height: 300px;
+}
+/*--------------------------------------------*/
+.settings p{
+    display: inline-block;
+}
+.settings input[type = "number"]{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 25%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
 }
 
 .canvas-container{
@@ -150,4 +187,7 @@ canvas{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    background-image: url("alpha_pattern.png");
+    background-size: 16px;
 }

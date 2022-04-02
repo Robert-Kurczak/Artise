@@ -8,17 +8,17 @@ export class UI{
         fileTab: $("#file_tab"),
         saveTab: $("#save_tab"),
         loadTab: $("#load_tab"),
-        editTab: $("#edit_tab"),
-        testNode: $("#test_node")
+        editTab: $("#edit_tab")
     };
 
     static activeTabs = [];
     static lastNestLevel = -1;
 
     static documentCreatorHolder = $("#document_creator_holder");
+    static selectedToolPrev = $("#selected_tool_preview");
     static colorPreview = $("#color_preview");
 
-    static saveStatus = $("#save_status");
+    static toolSettingPanel = $("#tool_setting_panel");
 
     static get canvasDimensions(){
         return canvasDimensions;
@@ -65,7 +65,7 @@ export class UI{
     }
 
     static hideActiveTabs(){
-        for(tab of this.activeTabs){
+        for(let tab of this.activeTabs){
             tab.hide();
         }
 
@@ -121,7 +121,7 @@ export class UI{
         $(".canvas-container").remove();
     }
 
-    static createCanvas(){
+    static createCanvas(canvasID){
         const data = $("#document_creator").serializeArray();
         this.hideDocumentCreator();
 
@@ -130,13 +130,24 @@ export class UI{
 
         $("body").append(`
         
-            <canvas width="`+ canvasDimensions.x +`" height='`+ canvasDimensions.y +`' id="main_canvas"></canvas>
+            <canvas width="`+ canvasDimensions.x +`" height='`+ canvasDimensions.y +`' id="`+ canvasID +`"></canvas>
 
         `);
 
         this.hideAllTabs();
     }
     
+    static showToolSettings(tool){
+        switch(tool){
+            case "brush":
+                this.toolSettingPanel.html(`
+                    <p>Brush size: </p>
+                    <input type="number" min=1 value="1" onchange="updateBrushWidth(this.value)">
+                `);
+                break;
+        }
+    }
+
     static pickr = Pickr.create({
         el: '#color_preview',
         theme: 'monolith',
@@ -179,9 +190,4 @@ export class UI{
 
 //---UI initialization---
 UI.hideAllTabs();
-
-UI.pickr.on("change", (color) => {
-    UI.colorPreview.css("background-color", color.toRGBA().toString(3));
-
-});
 //------

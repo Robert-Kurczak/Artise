@@ -67,18 +67,19 @@
 				</div>
 			</div>
 			<!--------------------------------------------------->
+			<span id="selected_tool_preview" class="material-icons-outlined"></span>
         </div>
 
         <div class="panel" id="tools_panel">
             <div id="tools_grid">
-                <span class="material-icons-outlined">highlight_alt</span>
-                <span class="material-icons-outlined">pinch</span>
-                <span class="material-icons-outlined">colorize</span>
-                <span class="material-icons-outlined">title</span>
-                <span class="material-icons-outlined">brush</span>
-                <span class="material-icons-outlined">format_color_fill</span>
-                <span class="material-icons-outlined">gradient</span>
-                <span class="material-icons-outlined">rectangle</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="select">highlight_alt</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="move">pinch</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="eyedropper">colorize</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="text">title</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="brush">brush</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="fill">format_color_fill</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="gradient">gradient</span>
+                <span class="material-icons-outlined" onclick="switchTool($(this))" data-tool_label="shape">rectangle</span>
             </div>
 
             <div class="UI_hr_stripe"></div>
@@ -86,9 +87,11 @@
             <div id="color_preview"></div>
         </div>
 
-        <!-- <div id="color_picker"></div> -->
+		<div class="panel settings" id="right_panel">
+			<div id="tool_setting_panel"></div>
+			<div id="layer_panel"></div>
+		</div>
 
         <div id="document_creator_holder"></div>
-
     </body>
 </html>

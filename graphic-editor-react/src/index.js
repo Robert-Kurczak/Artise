@@ -1,61 +1,66 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+//OLD - to rework
 import "./CSS/style.css"
 import "./CSS/UI.css"
+//
 
-class Tab extends React.Component{
-    tree = this.props.fields;
+import {tabsStructure} from "./tabsStructure"
 
-    treeHTML = ""
+function TabItem(props){
+    return(
+        <button className={"tab_item " + props.addClass}>{props.name}</button>
+    );
+}
 
-
-    generateTree(nodeObj, lastField=null, deepLevel = 0){
-        if(nodeObj == null){
-            return lastField;
-        }
+//Recursive function that generates nested tabs using
+//{name: "parent", menu: [{name: "child", ...}]} objects
+function Tab(props){
+    const wrapperClassName = props.rootTab ? "root_tab_wrapper" : "nested_tab_wrapper";
+    const buttonClassName = props.rootTab ? "tab_label" : null;
+    const divClassName = props.rootTab ? "panel tab" : "panel tab nested_tab";
     
-        if(lastField != null){
-            treeHTML += `
-                <button class="tab_item" onclick="UI.showDocumentCreator()">{lastField}</button>
-                <div class="UI_hr_stripe"></div>
-            `
+    const menuItems = props.content.menu.map((itemObj, index) => {
+        if("menu" in itemObj){
+            return <Tab key={index} content={itemObj}/>
+        }
+        else{
+            return <TabItem key={index} name={itemObj.name}/>;
         }
 
-        for(let field in nodeObj){
-            console.log(this.generateTree(nodeObj[field], field));
-        }
-    }
+    });
 
+    return(
+        <div className={wrapperClassName}>
+            <TabItem addClass={buttonClassName} name={props.content.name}/>
+
+            <div className={divClassName} id="file_tab">
+                {menuItems}
+            </div>
+            
+        </div>
+    );
+}
+
+//Automatically generates tab structure from tabsStructure.js
+//Then adds any other objects that were declared between <UpperPanel></UpperPanel>
+class UpperPanel extends React.Component{
+    //Render tabs structure from tabsStructure.js
     render(){
-        this.generateTree(this.tree);
+        const items = tabsStructure.map((itemObj, index) => 
+            <Tab rootTab={true} key={index} content={itemObj} />
+        );
 
         return(
-            <div class="root_tab_wrapper">
-                <button class="tab_item tab_label" onclick="UI.toggleTab(UI.tabs.fileTab, 0)">{this.props.label}</button>
-
-                <div class="panel tab" id="file_tab">
-                    
-                </div>
+            <div class="panel" id="upper_panel">
+                {items}
             </div>
-        )
+        );
     }
 }
 
-const fileTabTree = {
-    "New": null,
-    "Save": {
-        "Save to browser": null,
-        "Save JSON": null
-    },
-    "Load": {
-        "Load from browser": null,
-        "Load PNG": null,
-        "Load from JSON": null
-        }
-};
-
 ReactDOM.render(
-    <Tab label="File" fields={fileTabTree}/>,
+    <UpperPanel />,
     document.getElementById('root')
-  );
+);

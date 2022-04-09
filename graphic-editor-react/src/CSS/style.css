@@ -1,0 +1,15 @@
+@font-face {
+    font-family: "Share Tech Mono";
+    src: url(ShareTechMono-Regular.ttf) format("truetype");
+}
+
+*{
+    font-family: "Share Tech Mono", monospace;
+    color: #E2EBFA;
+}
+
+body{
+    background-color: #141414;
+    overflow: hidden;
+    margin: 0;
+}

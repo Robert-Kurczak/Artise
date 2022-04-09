@@ -1,0 +1,193 @@
+.panel{
+    background-color: #212121;
+    box-shadow: 0px 0px 15px 2px black;
+    overflow: hidden;
+}
+
+.UI_hr_stripe{
+    height: 2px;
+    width: 75%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: table;
+    margin: auto;
+}
+
+/* #upper_panel{
+    position: relative;
+    z-index: 3;
+} */
+
+/*-------------------Tabs---------------------*/
+.nested_tab_wrapper{
+    overflow: inherit;
+    position: relative;
+}
+
+.root_tab_wrapper{
+    display: inline-block;
+}
+
+.tab{
+    width: 6%;
+    position: absolute;
+    z-index: 2;
+    overflow: initial;
+}
+
+.tab_item{
+    width: 100%;
+    height: 30px;
+    background-color: #212121;
+    border: none;
+    font-size: 75%;
+    cursor: pointer;
+    transition-duration: 0.3s;
+}
+
+.tab_label{
+    padding: 10px 10px;
+    width: auto;
+    height: auto;
+}
+
+.tab_item:hover{
+    background-color: #141414;
+}
+
+.nested_tab{
+    left: 100%;
+    width: 175%;
+    top: 0px;
+}
+
+#selected_tool_preview{
+    float: right;
+    margin-right: 3%;
+    padding-top: 4px;
+}
+/*-------------document creator------------*/
+#document_creator{
+    width: 30%;
+    height: auto;
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding-top: 1%;
+    z-index: 2;
+}
+
+#document_creator .tab_item{
+    width: 35%;
+}
+
+#document_creator p{
+    display: inline-block;
+    margin-right: 2%;
+}
+
+#document_creator input[type = "number"]{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 15%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
+}
+
+#document_creator input[type = "number"]::-webkit-outer-spin-button,
+#document_creator input[type = "number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/*--------------------------------------------*/
+
+/*-------------------Panels-------------------*/
+#tools_panel{
+    display: inline-block;
+    padding: 5px;
+    position: absolute;
+    top: 25%;
+    overflow: initial;
+}
+
+#tools_grid{
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    grid-template-rows: repeat(auto, 40px);
+}
+
+#tools_grid span{
+    line-height: 40px;
+    text-align: center;
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+#tools_grid span:hover{
+    background-color: #141414;
+}
+
+#color_preview{
+    width: 60%;
+    height: 35px;
+    margin: 30% auto 10% auto;
+    background-color: white;
+    cursor: pointer;
+}
+
+.color_picker_custom{
+    position: absolute;
+    left: 90px !important;
+    top: 25% !important;
+    background-color: #212121;
+    
+}
+
+.color_picker_custom .pcr-interaction .pcr-result{
+    text-align: center;
+    flex: 1 1 16em;
+}
+
+#right_panel{
+    width: 15%;
+    padding: 15px;
+    position: absolute;
+    top: 25%;
+    right: 0;
+}
+
+#layer_panel{
+    height: 300px;
+}
+/*--------------------------------------------*/
+.settings p{
+    display: inline-block;
+}
+.settings input[type = "number"]{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 25%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
+}
+
+.canvas-container{
+    position: absolute !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-image: url("alpha_pattern.png");
+    background-size: 16px;
+}

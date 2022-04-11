@@ -1,4 +1,4 @@
-export const tabsStructure = [
+const tabsStructure = [
     {name: "File",
         menu: [
             {name: "New"},
@@ -9,7 +9,8 @@ export const tabsStructure = [
                     {name: "Parent",
                         menu: [
                             {name: "Child1"},
-                            {name: "Child2"}
+                            {name: "Child2"},
+                            {name: "CHild3"}
                         ]
                     }
                 ],
@@ -17,10 +18,12 @@ export const tabsStructure = [
             {name: "Load"}
         ]
     },
+    
     {name: "Edit",
         menu: [
             {name: "Resize"}
         ]
     }
-
 ];
+
+export default tabsStructure;

@@ -11,7 +11,7 @@ function UpperPanel(){
     );
 
     return(
-        <div class="panel" id="upper_panel">
+        <div className="panel">
             {items}
         </div>
     );

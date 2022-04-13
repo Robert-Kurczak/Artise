@@ -1,14 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import {StrictMode} from "react";
+import {createRoot} from "react-dom/client";
 
-import UpperPanel from './components/tabs/UpperPanel';
+import App from "./components/App";
 
-//OLD - to rework
-import "./CSS/style.css"
-import "./CSS/UI.css"
-//
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
 
-ReactDOM.render(
-    <UpperPanel />,
-    document.getElementById('root')
+root.render(
+    <StrictMode>
+        <App />
+    </StrictMode>
 );

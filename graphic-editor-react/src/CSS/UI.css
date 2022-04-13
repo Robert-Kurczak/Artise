@@ -1,65 +1,4 @@
-.panel{
-    background-color: #212121;
-    box-shadow: 0px 0px 15px 2px black;
-    overflow: hidden;
-}
-
-.UI_hr_stripe{
-    height: 2px;
-    width: 75%;
-    background-color: rgba(255, 255, 255, 0.1);
-    display: table;
-    margin: auto;
-}
-
-/* #upper_panel{
-    position: relative;
-    z-index: 3;
-} */
-
 /*-------------------Tabs---------------------*/
-.nested_tab_wrapper{
-    overflow: inherit;
-    position: relative;
-}
-
-.root_tab_wrapper{
-    display: inline-block;
-}
-
-.tab{
-    width: 6%;
-    position: absolute;
-    z-index: 2;
-    overflow: initial;
-}
-
-.tab_item{
-    width: 100%;
-    height: 30px;
-    background-color: #212121;
-    border: none;
-    font-size: 75%;
-    cursor: pointer;
-    transition-duration: 0.3s;
-}
-
-.tab_label{
-    padding: 10px 10px;
-    width: auto;
-    height: auto;
-}
-
-.tab_item:hover{
-    background-color: #141414;
-}
-
-.nested_tab{
-    left: 100%;
-    width: 175%;
-    top: 0px;
-}
-
 #selected_tool_preview{
     float: right;
     margin-right: 3%;
@@ -108,31 +47,6 @@
 /*--------------------------------------------*/
 
 /*-------------------Panels-------------------*/
-#tools_panel{
-    display: inline-block;
-    padding: 5px;
-    position: absolute;
-    top: 25%;
-    overflow: initial;
-}
-
-#tools_grid{
-    display: grid;
-    grid-template-columns: repeat(2, 40px);
-    grid-template-rows: repeat(auto, 40px);
-}
-
-#tools_grid span{
-    line-height: 40px;
-    text-align: center;
-    transition-duration: 0.3s;
-    cursor: pointer;
-}
-
-#tools_grid span:hover{
-    background-color: #141414;
-}
-
 #color_preview{
     width: 60%;
     height: 35px;

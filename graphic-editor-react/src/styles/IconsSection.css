@@ -9,6 +9,7 @@
     text-align: center;
     transition-duration: 0.3s;
     cursor: pointer;
+    user-select: none;
 }
 
 .tools_grid span:hover{

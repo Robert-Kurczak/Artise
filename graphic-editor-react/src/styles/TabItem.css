@@ -3,16 +3,8 @@
     height: 30px;
     padding: 0px 30px;
     text-align: left;
-    background-color: #212121;
-    border: none;
     font-size: 75%;
-    cursor: pointer;
-    transition-duration: 0.3s;
     white-space: nowrap;
-}
-
-.tab_item:hover{
-    background-color: #141414;
 }
 
 .tab_label{

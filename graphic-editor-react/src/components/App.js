@@ -1,29 +1,27 @@
 import "../styles/App.css"
 
 import UpperPanel from "./UpperPanel/UpperPanel"
+import TabsStructure from "./UpperPanel/Tabs/TabsStructure";
 import ToolsPanel from "./ToolsPanel/ToolsPanel"
 import DocumentCreator from "./DocumentCreator/DocumentCreator";
-
-import { useState, createContext } from "react";
-
-export const AppContext = createContext();
+import { useState } from "react";
 
 function App(){
-    const [showCreator, setShowCreator] = useState(false);
+    const [showDocumentCreator, setShowDocumentCreator] = useState(false);
 
     const componentsHooks = {
-        DocumentCreatorState: [showCreator, setShowCreator]
+        setShowDocumentCreator
     };
 
+    
     return(
         <>
-            {/* <AppContext.Provider value={componentsHooks}> */}
-                <UpperPanel/>
-            {/* </AppContext.Provider> */}
+            <UpperPanel>
+                <TabsStructure hooks={componentsHooks}/>
+            </UpperPanel>
 
             <ToolsPanel/>
-            {/* {showCreator? <DocumentCreator/>: null} */}
-            <DocumentCreator/>
+            {showDocumentCreator? <DocumentCreator/>: null}
         </>
     );
 }

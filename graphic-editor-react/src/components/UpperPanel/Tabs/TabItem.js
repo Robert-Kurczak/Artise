@@ -1,4 +1,4 @@
-import "../../styles/TabItem.css"
+import "../../../styles/TabItem.css"
 
 //Smallest node in displayed tab
 function TabItem(props){

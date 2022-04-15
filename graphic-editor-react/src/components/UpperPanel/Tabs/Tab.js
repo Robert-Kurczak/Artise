@@ -1,4 +1,4 @@
-import "../../styles/Tab.css"
+import "../../../styles/Tab.css"
 
 import {useState, useEffect, useRef} from "react";
 import TabItem from "./TabItem"

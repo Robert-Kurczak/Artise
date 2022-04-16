@@ -1,6 +1,7 @@
 import "../../styles/DocumentCreator.css"
 
-function DocumentCreator(){
+function DocumentCreator(props){
+
     return(
         <form className="panel document_creator">
             <p>Width</p><input className="number_input" name="resolutionX" type="number" min="1" defaultValue="512"/>
@@ -9,8 +10,8 @@ function DocumentCreator(){
             <br/>
             <br/>
 
-            <button type="reset" className="button_item">Cancel</button>
-            <button type="button" className="button_item">Create</button>
+            <button type="reset" className="button_item" onClick={props.cancel}>Cancel</button>
+            <button type="button" className="button_item" onClick={() => {props.cancel(); props.create()}}>Create</button>
         </form>
     );
 }

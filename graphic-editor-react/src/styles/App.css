@@ -27,3 +27,33 @@ body{
     display: table;
     margin: auto;
 }
+
+.number_input{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 15%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
+}
+
+.number_input::-webkit-outer-spin-button,
+.number_input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.button_item{
+    background-color: #212121;
+    border: none;
+    cursor: pointer;
+    transition-duration: 0.3s;
+}
+
+.button_item:hover{
+    background-color: #141414;
+}

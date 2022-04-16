@@ -1,4 +1,4 @@
-import "../../styles/Tab.css"
+import "../../../styles/Tab.css"
 
 import {useState, useEffect, useRef} from "react";
 import TabItem from "./TabItem"
@@ -24,7 +24,7 @@ function Tab(props){
         }
         //else just add normal item
         else{
-            return <TabItem key={itemObj.name + "_item"} name={itemObj.name}/>;
+            return <TabItem key={itemObj.name + "_item"} name={itemObj.name} onClick={itemObj.onClick}/>;
         }
     });
 

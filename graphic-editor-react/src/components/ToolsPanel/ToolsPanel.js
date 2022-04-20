@@ -1,16 +1,14 @@
 import "../../styles/ToolsPanel.css"
 import IconsSection from "./IconsSection";
 import SectionStripe from "../SectionStripe"
+import ColorPicker from "./ColorPicker/ColorPicker";
 
-function ToolsPanel(){
+function ToolsPanel(props){
     return(
         <div className="panel tools_panel">
             <IconsSection/>
-
-            {/*--TODO--*/}
             <SectionStripe/>
-
-            <div id="color_preview"></div>
+            <ColorPicker setColorPicker={props.setColorPicker}/>
         </div>
     );
 }

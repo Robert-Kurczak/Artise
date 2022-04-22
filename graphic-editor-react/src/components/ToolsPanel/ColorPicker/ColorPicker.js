@@ -7,7 +7,7 @@ import Pickr from "@simonwep/pickr"
 function ColorPicker(props){
     const defaultColor = "#ffffff"
 
-    const {setColorPicker} = props;
+    const {colorPicker, setColorPicker} = props;
     const [background, setBackground] = useState(defaultColor) 
 
     useEffect(() => {

@@ -1,14 +1,29 @@
 import Tab from "./Tab";
 
+import openFile from "./openFile";
+
+import { mainCanvasContext } from "../../App";
+import { useContext } from "react";
+
+
 //Automatically generates tab structure from tabsStructure.js
 //Then adds any other objects that were declared between <UpperPanel></UpperPanel>
 function TabsStructure(props){
+    const mainCanvas = useContext(mainCanvasContext);
+
+    const {
+        setShowDocumentCreator,
+        setShowDocumentEditor,
+        setCanvasImage,
+        setShowMainCanvas
+    } = props.hooks
+
     const structure = [
         {name: "File",
             menu: [
                 {
                     name: "New",
-                    onClick: () => {props.hooks.setShowDocumentCreator(true)}
+                    onClick: () => {setShowDocumentCreator(true)}
                 },
                 {name: "Save",
                     menu: [
@@ -23,8 +38,14 @@ function TabsStructure(props){
                     ],
                 },
                 {
-                    name: "Load",
-                    onClick: () => {/*Toggle component*/}
+                    name: "Open",
+                    onClick: () => {
+                        openFile(
+                            mainCanvas,
+                            setCanvasImage,
+                            setShowMainCanvas
+                        )
+                    }
                 }
             ]
         },
@@ -33,7 +54,7 @@ function TabsStructure(props){
             menu: [
                 {
                     name: "Resize",
-                    onClick: () => {/*Toggle component*/}
+                    onClick: () => {setShowDocumentEditor(true)}
                 }
             ]
         }

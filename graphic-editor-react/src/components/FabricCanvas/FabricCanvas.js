@@ -5,18 +5,31 @@ import { fabric } from "fabric";
 
 function FabricCanvas(props){
     const canvasID = "fabric_canvas";
-    const { setCanvas, canvasResolution } = props;
+    const { mainCanvas, setCanvas, canvasResolution, canvasImage } = props;
 
     useEffect(() => {
-        setCanvas(new fabric.Canvas(canvasID, {
-                width: canvasResolution.x, 
-                height: canvasResolution.y,
-                isDrawingMode: true
-            }));
-    }, [setCanvas, canvasResolution]);
+        var canvas = new fabric.Canvas(canvasID, {
+            width: canvasResolution.x,
+            height: canvasResolution.y,
+
+            isDrawingMode: true
+        });
+
+        if(canvasImage){
+            canvas.setWidth(canvasImage.width);
+            canvas.setHeight(canvasImage.height);
+
+            canvas.add(canvasImage).setActiveObject(canvasImage).renderAll();
+        }
+
+        setCanvas(canvas);
+
+    }, [setCanvas, canvasResolution, canvasImage]);
 
     return(
-        <canvas id={canvasID}></canvas>
+        <span id="canvas_holder">
+            <canvas width={canvasResolution.x} id={canvasID}></canvas>
+        </span>
     );
 }
 

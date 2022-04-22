@@ -8,6 +8,7 @@ function IconsSection(){
         <Icon key={index} iconName={toolObj.iconName}></Icon>
     );
 
+    //Move it to tools.js and move tools to tools.js so tools function have access to hooks
     return(
         <div className="tools_grid">
             {icons}

@@ -1,8 +1,13 @@
 import "../../styles/DocumentCreator.css"
+import { useContext } from "react";
 
-function DocumentCreator(props){
-    var width = props.canvasResolution.x;
-    var height = props.canvasResolution.y;
+import { mainCanvasContext } from "../App";
+
+function DocumentEditor(props){
+    const canvas = useContext(mainCanvasContext)
+
+    var width = canvas.width;
+    var height = canvas.height;
 
     const changeWidth = e => width = e.target.value;
     const changeHeight = e => height = e.target.value;
@@ -11,11 +16,12 @@ function DocumentCreator(props){
         props.hideCreator();
     }
 
-    const create = () => {
-        props.setCanvasResolution({x: parseInt(width), y: parseInt(height)})
-        
-        props.showCanvas();
+    const edit = () => {
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+
         props.hideCreator();
+        //TODO scale objects in canvas
     }
 
     return(
@@ -29,9 +35,9 @@ function DocumentCreator(props){
             <br/>
 
             <button type="button" className="button_item" onClick={cancel}>Cancel</button>
-            <button type="button" className="button_item" onClick={create}>Create</button>
+            <button type="button" className="button_item" onClick={edit}>Edit</button>
         </form>
     );
 }
 
-export default DocumentCreator;
+export default DocumentEditor;

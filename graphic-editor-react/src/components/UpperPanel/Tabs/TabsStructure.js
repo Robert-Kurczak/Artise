@@ -2,14 +2,14 @@ import Tab from "./Tab";
 
 import openFile from "./openFile";
 
-import { mainCanvasContext } from "../../App";
+import { GlobalContext } from "../../App";
 import { useContext } from "react";
 
 
 //Automatically generates tab structure from tabsStructure.js
 //Then adds any other objects that were declared between <UpperPanel></UpperPanel>
 function TabsStructure(props){
-    const mainCanvas = useContext(mainCanvasContext);
+    const { mainCanvas } = useContext(GlobalContext);
 
     const {
         setShowDocumentCreator,

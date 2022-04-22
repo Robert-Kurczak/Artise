@@ -21,18 +21,3 @@
     height: 300px;
 }
 /*--------------------------------------------*/
-.settings p{
-    display: inline-block;
-}
-.settings input[type = "number"]{
-    background-color: #141414;
-    color: white;
-    border: none;
-    text-align: center;
-    width: 25%;
-    height: 25px;
-    font-style: normal;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    font-size: 100%;
-    -moz-appearance: textfield;
-}

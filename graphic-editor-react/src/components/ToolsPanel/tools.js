@@ -1,164 +1,164 @@
-import {
-    useContext,
-    useState
-} from "react";
-import {
-    mainCanvasContext
-} from "../App"
+import { useContext, useState } from "react";
+import { GlobalContext } from "../App"
 
 import Icon from "./Icon";
 
 class Tool {
-    constructor(iconName, enableFunction, disableFunction) {
-        this.iconName = iconName;
-        this.enable = () => {
-            enableFunction()
-        };
-        this.disable = () => {
-            disableFunction()
-        };
-    }
+	constructor(toolName, iconName, enableFunction, disableFunction){
+		this.toolName = toolName;
+		this.iconName = iconName;
+
+		this.enable = () => {
+			enableFunction()
+		};
+
+		this.disable = () => {
+			disableFunction()
+		};
+	}
 }
 
+//Due to the fact that component's shouldn't be passed as props
+//I use tool name for identification purpouses in other component's.
+
+//To add tool's setting panel in SettingsPanel component,
+//you have to add case in ToolSettingSection that render specific component
+//based on given tool's name
+
+//Maybe there's some workaround
+
 function Tools() {
-    const mainCanvas = useContext(mainCanvasContext);
+	const { mainCanvas, currentTool, setCurrentTool } = useContext(GlobalContext);
 
-    const [currentTool, setCurrentTool] = useState();
+	const switchTool = (tool) => {
+		if (currentTool) currentTool.disable();
 
-    const switchTool = (tool) => {
-        if (currentTool) currentTool.disable();
+		tool.enable();
 
-        tool.enable();
+		setCurrentTool(tool);
+	}
 
-        setCurrentTool(tool);
+	/* #region  Brush */
+	const brushTool = new Tool(
+		"brush",
+		"brush",
+		//Enable
+		() => {
+			mainCanvas.isDrawingMode = true;
+		},
+		//Disable
+		() => {
+			mainCanvas.isDrawingMode = false;
+		}
+	);
+	/* #endregion */
 
-        console.log("switching", tool)
-    }
+	/* #region  Eyedropper */
+	const eyedropperTool = new Tool(
+		"eyedropper",
+		"colorize",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Brush */
-    const brushTool = new Tool(
-        "brush",
-        () => {
-            mainCanvas.isDrawingMode = true;
-        },
-        () => {
-            mainCanvas.isDrawingMode = false;
-        }
-    );
-    /* #endregion */
+	/* #region  Fill */
+	const fillTool = new Tool(
+		"fill",
+		"format_color_fill",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Eyedropper */
-    const eyedropperTool = new Tool(
-        "colorize",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	/* #region  Gradient */
+	const gradientTool = new Tool(
+		"gradient",
+		"gradient",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Fill */
-    const fillTool = new Tool(
-        "format_color_fill",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	/* #region  Move */
+	const moveTool = new Tool(
+		"move",
+		"pinch",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Gradient */
-    const gradientTool = new Tool(
-        "gradient",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	/* #region  Select */
+	const selectTool = new Tool(
+		"select",
+		"highlight_alt",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Move */
-    const moveTool = new Tool(
-        "pinch",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	/* #region  Shape */
+	const shapeTool = new Tool(
+		"shape",
+		"rectangle",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Select */
-    const selectTool = new Tool(
-        "highlight_alt",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	/* #region  Text */
+	const textTool = new Tool(
+		"text",
+		"title",
+		() => {
+			//On
+		},
+		() => {
+			//Off
+		}
+	);
+	/* #endregion */
 
-    /* #region  Shape */
-    const shapeTool = new Tool(
-        "rectangle",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	const tools = [
+		brushTool,
+		eyedropperTool,
+		fillTool,
+		gradientTool,
+		moveTool,
+		selectTool,
+		shapeTool,
+	];
 
-    /* #region  Text */
-    const textTool = new Tool(
-        "title",
-        () => {
-            //On
-        },
-        () => {
-            //Off
-        }
-    );
-    /* #endregion */
+	const icons = tools.map((toolObj, index) =>
+		<Icon key={index} iconName={toolObj.iconName} onClick={() => {switchTool(toolObj)}}/>
+	);
 
-
-    const tools = [
-        brushTool,
-        eyedropperTool,
-        fillTool,
-        gradientTool,
-        moveTool,
-        selectTool,
-        shapeTool,
-    ];
-
-    const icons = tools.map((toolObj, index) =>
-        <
-        Icon key = {
-            index
-        }
-        iconName = {
-            toolObj.iconName
-        }
-        onClick = {
-            () => {
-                switchTool(toolObj)
-            }
-        }
-        />
-    );
-
-    return icons;
+	return icons;
 }
 
 export default Tools;

@@ -8,19 +8,30 @@ import DocumentEditor from "./DocumentCreator/DocumentEditor";
 import FabricCanvas from "./FabricCanvas/FabricCanvas";
 
 import { useState, createContext } from "react";
+import SettingsPanel from "./SettingsPanel/SettingsPanel";
 
-export const mainCanvasContext = createContext();
+export const GlobalContext = createContext();
 
 function App(){
+    //---Document creator---
     const [showDocumentCreator, setShowDocumentCreator] = useState(false);
     const [showDocumentEditor, setShowDocumentEditor] = useState(false);
+    //------
 
+    //---Canvas---
     const [showMainCanvas, setShowMainCanvas] = useState(false);
     const [mainCanvas, setMainCanvas] = useState("");
     const [canvasResolution, setCanvasResolution] = useState({x: 512, y: 512})
     const [canvasImage, setCanvasImage] = useState(null);
+    //------
 
+    //---Color picker---
     const [colorPicker, setColorPicker] = useState("");
+    //------
+
+    //---Tools---
+    const [currentTool, setCurrentTool] = useState();
+    //------
 
     //Maybe create object that collects all sorts of hooks regarding canvas and pass this?
     const hooksForTabs = {
@@ -29,9 +40,16 @@ function App(){
         setCanvasImage,
         setShowMainCanvas
     };
+
+    const GlobalContextContent = {
+        mainCanvas,
+
+        currentTool,
+        setCurrentTool
+    };
     
     return(
-        <mainCanvasContext.Provider value={mainCanvas}>
+        <GlobalContext.Provider value={GlobalContextContent}>
 
             <UpperPanel>
                 <TabsStructure hooks={hooksForTabs}/>
@@ -40,10 +58,14 @@ function App(){
             <ToolsPanel
                 setColorPicker={setColorPicker}
             />
+
+            <SettingsPanel
+                toolName={currentTool ? currentTool.toolName : ""}
+            />
             
             {/*That's a lot of hooks regarding canvas component
             //Maybe wrap them in single object ("canvasSetters") and pass this object around?*/}
-            {showDocumentCreator?
+            {showDocumentCreator &&
                 <DocumentCreator
                     setMainCanvas={setMainCanvas}
 
@@ -53,16 +75,16 @@ function App(){
                     hideCreator={() => {setShowDocumentCreator(false)}}
                     showCanvas={() => {setShowMainCanvas(true)}}
                 />
-            : null}
+            }
 
-            {showDocumentEditor?
+            {showDocumentEditor &&
                 <DocumentEditor
                     hideCreator={() => {setShowDocumentEditor(false)}}
                 />
                 
-            : null}
+            }
 
-            {showMainCanvas?
+            {showMainCanvas &&
                 <FabricCanvas
                     mainCanvas={mainCanvas}
                     setCanvas={setMainCanvas}
@@ -70,9 +92,9 @@ function App(){
 
                     canvasImage={canvasImage}
                 />
-            : null}
+            }
 
-        </mainCanvasContext.Provider>
+        </GlobalContext.Provider>
     );
 }
 

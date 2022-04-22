@@ -1,13 +1,13 @@
 import "../../styles/DocumentCreator.css"
 import { useContext } from "react";
 
-import { mainCanvasContext } from "../App";
+import { GlobalContext } from "../App";
 
 function DocumentEditor(props){
-    const canvas = useContext(mainCanvasContext)
+    const { mainCanvas } = useContext(GlobalContext)
 
-    var width = canvas.width;
-    var height = canvas.height;
+    var width = mainCanvas.width;
+    var height = mainCanvas.height;
 
     const changeWidth = e => width = e.target.value;
     const changeHeight = e => height = e.target.value;
@@ -17,8 +17,8 @@ function DocumentEditor(props){
     }
 
     const edit = () => {
-        canvas.setWidth(width);
-        canvas.setHeight(height);
+        mainCanvas.setWidth(width);
+        mainCanvas.setHeight(height);
 
         props.hideCreator();
         //TODO scale objects in canvas

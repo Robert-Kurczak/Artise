@@ -2,7 +2,7 @@ import "../../styles/icons.css"
 
 function Icon(props){
     return(
-        <span className="material-icons-outlined">{props.iconName}</span>
+        <span onClick={props.onClick} className="material-icons-outlined">{props.iconName}</span>
     );
 }
 

@@ -10,9 +10,7 @@ function FabricCanvas(props){
     useEffect(() => {
         var canvas = new fabric.Canvas(canvasID, {
             width: canvasResolution.x,
-            height: canvasResolution.y,
-
-            isDrawingMode: true
+            height: canvasResolution.y
         });
 
         if(canvasImage){

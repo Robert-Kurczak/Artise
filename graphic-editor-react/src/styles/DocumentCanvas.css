@@ -1,4 +1,4 @@
-.canvas-container{
+#canvas_wrapper{
     position: absolute !important;
     top: 50%;
     left: 50%;

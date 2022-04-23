@@ -5,7 +5,8 @@ import TabsStructure from "./UpperPanel/Tabs/TabsStructure";
 import ToolsPanel from "./ToolsPanel/ToolsPanel"
 import DocumentCreator from "./DocumentCreator/DocumentCreator";
 import DocumentEditor from "./DocumentCreator/DocumentEditor";
-import FabricCanvas from "./FabricCanvas/FabricCanvas";
+// import FabricCanvas from "./FabricCanvas/FabricCanvas";
+import DocumentCanvas from "./DocumentCanvas/DocumentCanvas";
 
 import { useState, createContext } from "react";
 import SettingsPanel from "./SettingsPanel/SettingsPanel";
@@ -85,12 +86,18 @@ function App(){
             }
 
             {showMainCanvas &&
-                <FabricCanvas
+                // <FabricCanvas
+                //     mainCanvas={mainCanvas}
+                //     setCanvas={setMainCanvas}
+                //     canvasResolution={canvasResolution}
+
+                //     canvasImage={canvasImage}
+                // />
+
+                <DocumentCanvas
                     mainCanvas={mainCanvas}
                     setCanvas={setMainCanvas}
                     canvasResolution={canvasResolution}
-
-                    canvasImage={canvasImage}
                 />
             }
 

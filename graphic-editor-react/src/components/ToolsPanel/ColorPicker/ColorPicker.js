@@ -1,14 +1,16 @@
 import "../../../styles/monolith.min.css"
 import "../../../styles/ColorPicker.css"
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Pickr from "@simonwep/pickr"
+import { GlobalContext } from "../../App";
 
 function ColorPicker(props){
     const defaultColor = "#ffffff"
 
-    const {colorPicker, setColorPicker} = props;
-    const [background, setBackground] = useState(defaultColor) 
+    const {setColorPicker} = props;
+    const [background, setBackground] = useState(defaultColor)
+    const { mainCanvas } = useContext(GlobalContext);
 
     useEffect(() => {
         const pickr = Pickr.create({
@@ -49,15 +51,19 @@ function ColorPicker(props){
         });
 
         //Updating color preview div with selected color
+        //and color in mainCanvas object
+        mainCanvas && mainCanvas.setColor(defaultColor);
+        
         pickr.on("change", (color) => {
             const rgba = color.toRGBA().toString(3);
-
+            
+            mainCanvas.setColor(rgba);
             setBackground(rgba);
         });
 
         setColorPicker(pickr);
 
-    }, [setColorPicker]);
+    }, [setColorPicker, mainCanvas]);
 
     return(
         <div style={{backgroundColor: background}} id="color_preview"></div>

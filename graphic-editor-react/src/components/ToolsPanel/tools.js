@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { GlobalContext } from "../App"
 
 import Icon from "./Icon";
@@ -31,7 +31,11 @@ function Tools() {
 	const { mainCanvas, currentTool, setCurrentTool } = useContext(GlobalContext);
 
 	const switchTool = (tool) => {
-		if (currentTool) currentTool.disable();
+		if(currentTool){
+			if (currentTool.toolName === tool.toolName) return;
+			currentTool.disable();
+		}
+		
 
 		tool.enable();
 
@@ -44,11 +48,26 @@ function Tools() {
 		"brush",
 		//Enable
 		() => {
-			mainCanvas.isDrawingMode = true;
+			mainCanvas.setDrawMode("brush");
 		},
 		//Disable
 		() => {
-			mainCanvas.isDrawingMode = false;
+			mainCanvas.clearMode();
+		}
+	);
+	/* #endregion */
+
+	/* #region  Pencil */
+	const pencilTool = new Tool(
+		"pencil",
+		"edit",
+		//Enable
+		() => {
+			// mainCanvas.setDrawMode("brush");
+		},
+		//Disable
+		() => {
+			// mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */
@@ -118,15 +137,32 @@ function Tools() {
 	);
 	/* #endregion */
 
-	/* #region  Shape */
-	const shapeTool = new Tool(
-		"shape",
-		"rectangle",
+	/* #region  Line */
+	const lineTool = new Tool(
+		"line",
+		"horizontal_rule",
+		//Enable
 		() => {
-			//On
+			mainCanvas.drawLineMode();
 		},
+		//Disable
 		() => {
-			//Off
+			mainCanvas.clearMode();
+		}
+	);
+	/* #endregion */
+
+	/* #region  Rectangle */
+	const rectangleTool = new Tool(
+		"rectangle",
+		"rectangle",
+		//Enable
+		() => {
+			mainCanvas.drawRectMode();
+		},
+		//Disable
+		() => {
+			mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */
@@ -145,13 +181,16 @@ function Tools() {
 	/* #endregion */
 
 	const tools = [
-		brushTool,
+		selectTool,
+		moveTool,
 		eyedropperTool,
+		textTool,
+		brushTool,
+		pencilTool,
 		fillTool,
 		gradientTool,
-		moveTool,
-		selectTool,
-		shapeTool,
+		lineTool,
+		rectangleTool
 	];
 
 	const icons = tools.map((toolObj, index) =>

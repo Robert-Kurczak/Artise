@@ -5,7 +5,6 @@ import TabsStructure from "./UpperPanel/Tabs/TabsStructure";
 import ToolsPanel from "./ToolsPanel/ToolsPanel"
 import DocumentCreator from "./DocumentCreator/DocumentCreator";
 import DocumentEditor from "./DocumentCreator/DocumentEditor";
-// import FabricCanvas from "./FabricCanvas/FabricCanvas";
 import DocumentCanvas from "./DocumentCanvas/DocumentCanvas";
 
 import { useState, createContext } from "react";
@@ -21,7 +20,7 @@ function App(){
 
     //---Canvas---
     const [showMainCanvas, setShowMainCanvas] = useState(false);
-    const [mainCanvas, setMainCanvas] = useState("");
+    const [mainCanvas, setMainCanvas] = useState(null);
     const [canvasResolution, setCanvasResolution] = useState({x: 512, y: 512})
     const [canvasImage, setCanvasImage] = useState(null);
     //------
@@ -64,8 +63,6 @@ function App(){
                 toolName={currentTool ? currentTool.toolName : ""}
             />
             
-            {/*That's a lot of hooks regarding canvas component
-            //Maybe wrap them in single object ("canvasSetters") and pass this object around?*/}
             {showDocumentCreator &&
                 <DocumentCreator
                     setMainCanvas={setMainCanvas}
@@ -86,17 +83,8 @@ function App(){
             }
 
             {showMainCanvas &&
-                // <FabricCanvas
-                //     mainCanvas={mainCanvas}
-                //     setCanvas={setMainCanvas}
-                //     canvasResolution={canvasResolution}
-
-                //     canvasImage={canvasImage}
-                // />
-
                 <DocumentCanvas
-                    mainCanvas={mainCanvas}
-                    setCanvas={setMainCanvas}
+                    setMainCanvas={setMainCanvas}
                     canvasResolution={canvasResolution}
                 />
             }

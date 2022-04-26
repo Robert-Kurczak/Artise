@@ -5,13 +5,13 @@ import Canvas from "./Canvas";
 
 function DocumentCanvas(props){
     const wrapperID = "canvas_wrapper"
-    const { mainCanvas, setCanvas, canvasResolution, canvasImage } = props;
+    const { setMainCanvas, canvasResolution } = props;
 
     useEffect(() => {
-        var canvas = new Canvas(wrapperID, canvasResolution.x, canvasResolution.y);
+        const canvas = new Canvas(wrapperID, canvasResolution.x, canvasResolution.y);
 
-        setCanvas(canvas);
-    }, [setCanvas, canvasResolution]);
+        setMainCanvas(canvas);
+    }, [setMainCanvas, canvasResolution]);
 
 
     return(

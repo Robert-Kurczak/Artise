@@ -1,0 +1,6 @@
+.layer_color{
+    width: 15%;
+    aspect-ratio: 1;
+    border-radius: 25%;
+    cursor: pointer;
+}

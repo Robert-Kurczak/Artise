@@ -116,7 +116,7 @@ function Tools() {
 		"move",
 		"pinch",
 		() => {
-			//On
+			mainCanvas.clearMode();
 		},
 		() => {
 			//Off
@@ -194,7 +194,7 @@ function Tools() {
 	];
 
 	const icons = tools.map((toolObj, index) =>
-		<Icon key={index} iconName={toolObj.iconName} onClick={() => {switchTool(toolObj)}}/>
+		<Icon key={index} toolName={toolObj.toolName} iconName={toolObj.iconName} onClick={() => {switchTool(toolObj)}}/>
 	);
 
 	return icons;

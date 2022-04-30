@@ -1,8 +1,8 @@
-import "../../styles/icons.css"
-
 function Icon(props){
+    const { onClick, toolName, iconName } = props;
+
     return(
-        <span onClick={props.onClick} className="material-icons-outlined">{props.iconName}</span>
+        <span onClick={onClick} title={toolName} className="material-icons-outlined">{iconName}</span>
     );
 }
 

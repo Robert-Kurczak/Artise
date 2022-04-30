@@ -8,6 +8,7 @@
 
 .settings p{
     display: inline-block;
+    user-select: none;
 }
 .settings input[type = "number"]{
     background-color: #141414;
@@ -20,9 +21,4 @@
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     font-size: 100%;
     -moz-appearance: textfield;
-}
-
-/* Move to other file */
-.layer_section{
-    height: 300px;
 }

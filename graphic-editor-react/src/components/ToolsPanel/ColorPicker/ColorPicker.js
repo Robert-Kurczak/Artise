@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import Pickr from "@simonwep/pickr"
 import { GlobalContext } from "../../App";
 
+//TODO, cleanup effect
 function ColorPicker(props){
     const defaultColor = "#ffffff"
 

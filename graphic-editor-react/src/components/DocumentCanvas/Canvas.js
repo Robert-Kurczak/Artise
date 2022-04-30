@@ -1,4 +1,7 @@
 class Canvas{
+    #LAYER_NUM_OFFSET = 100;
+    #MAX_LAYER = 9999;
+
     #canvasWrapper;
     #canvasBoundingRect;
 
@@ -14,7 +17,7 @@ class Canvas{
         mouseup: null
     }
 
-    #currentLayer;
+    currentLayer;
 
     width;
     height;
@@ -38,31 +41,45 @@ class Canvas{
         this.layers.push(layerObj);
         this.#canvasWrapper.appendChild(layer);
 
-        // this.#currentLayer = layerObj;
+        // this.currentLayer = layerObj;
     }
 
     changeLayer(layerID){
-        if(layerID >= this.layers.length) return;
+        // if(layerID >= this.layers.length) return;
 
-        this.#currentLayer.canvasNode.style.zIndex = this.#currentLayer.id + 10;
-        const prevLayerID = this.#currentLayer.id;
+        const prevLayerID = this.currentLayer.id;
+        
+        //---Cleaning previous layer---
+        this.currentLayer.canvasNode.style.zIndex = this.currentLayer.id + this.#LAYER_NUM_OFFSET;  //Moving layer to the back
+        this.clearMode();   //Removing events from layer
+        //------
 
-        //Change layer
-        this.#currentLayer = this.layers[layerID];
-        this.#currentLayer.canvasNode.style.zIndex = 9999;
+        //Sellecting new layer
+        this.currentLayer = this.layers[layerID];
+        this.currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
 
-        //---Moving events (therefore mode) from previous layer to current---
+        //---Attaching current mode events to the new layer---
         //TODO - Redundant code
-        this.#currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
-        this.#currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
-
-        this.clearMode();
+        this.currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
+        this.currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
         //------
 
         //---Moving settings from previous layer to current---
-        this.#currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
-        this.#currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
+        this.currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
+        this.currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
         //------
+    }
+
+    removeLayer(layerID){
+        this.layers.splice(layerID, 1);
+    }
+
+    hideLayer(layerID){
+        this.layers[layerID].canvasNode.style.display = "none";
+    }
+
+    showLayer(layerID){
+        this.layers[layerID].canvasNode.style.display = "block";
     }
 
     constructor(wrapperID, width, height){
@@ -78,17 +95,17 @@ class Canvas{
         //---Creating main layer---
         this.addLayer();
 
-        //changeLayers bases on #currentLayer property.
-        //At the time of constructing #currentLayer is not set
+        //changeLayers bases on currentLayer property.
+        //At the time of constructing currentLayer is not set
         //Instead of writing code in changeLayers for this specific case
         //I initialize layer here
-        this.#currentLayer = this.layers[0];
-        this.#currentLayer.canvasNode.style.zIndex = 9999;
+        this.currentLayer = this.layers[0];
+        this.currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;
         //------
 
         //---Creating auxilary canvas---
-        this.#auxilaryCanvas = this.#currentLayer.canvasNode.cloneNode();
-        this.#auxilaryCanvas.style = "position: absolute; z-index: 10; pointer-events: none;";
+        this.#auxilaryCanvas = this.currentLayer.canvasNode.cloneNode();
+        this.#auxilaryCanvas.style = `position: absolute; z-index: ${this.#MAX_LAYER + 1}; pointer-events: none;`;
         this.#auxilaryCanvas.setAttribute("id", "auxilary-canvas");
         this.#auxilaryCanvasCTX = this.#auxilaryCanvas.getContext("2d");
 
@@ -107,7 +124,8 @@ class Canvas{
         this.setBrushSize(5);
 
         this.addLayer();
-        this.changeLayer(1);
+        this.addLayer();
+        // this.changeLayer(1);
         // this.changeLayer(0);
         //------
     }
@@ -122,34 +140,30 @@ class Canvas{
         return currentPosition;
     }
 
-    //---Setters---
     setColor(color){
-        this.#currentLayer.canvasCTX.strokeStyle = color;
+        this.currentLayer.canvasCTX.strokeStyle = color;
         this.#auxilaryCanvasCTX.strokeStyle = color;
     }
 
     setBrushSize(size){
         if(size > 0){
-            this.#currentLayer.canvasCTX.lineWidth = size;
+            this.currentLayer.canvasCTX.lineWidth = size;
             this.#auxilaryCanvasCTX.lineWidth = size;
         }
     }
-    //------
 
-    //---Getters---
     getBrushSize(){
-        return this.#currentLayer.canvasCTX.lineWidth
+        return this.currentLayer.canvasCTX.lineWidth
     }
-    //------
 
     setDrawMode(mode){
         var lastPosition;
 
+        this.currentLayer.canvasCTX.lineCap = "round";
         const brushDraw = (event) => {
-            const layerCTX = this.#currentLayer.canvasCTX;
+            const layerCTX = this.currentLayer.canvasCTX;
 
             layerCTX.beginPath();
-            // layerCTX.lineCap = "round";
             layerCTX.moveTo(lastPosition.x, lastPosition.y);
     
             lastPosition = this.#extractPosition(event);
@@ -165,23 +179,24 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.#currentLayer.canvasNode.addEventListener("mousemove", drawingMethod);
+            this.currentLayer.canvasNode.addEventListener("mousemove", drawingMethod);
         }
 
         const handleMouseUp = () => {
-            this.#currentLayer.canvasNode.removeEventListener("mousemove", drawingMethod);
+            this.currentLayer.canvasNode.removeEventListener("mousemove", drawingMethod);
         }
 
-        this.#currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-        this.#currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
 
-        //Maybe move to layer object?
+        //Maybe move to it layer object?
         this.#eventFunctions.mousedown = handleMouseDown;
         this.#eventFunctions.mouseup = handleMouseUp;
     }
 
     drawLineMode(){
         var lastPosition;
+        this.currentLayer.canvasCTX.lineCap = "square";
 
         //Drawing line from stored position to mouse position on
         //auxilary canvas
@@ -190,7 +205,6 @@ class Canvas{
 
             this.#auxilaryCanvasCTX.clearRect(0, 0, this.width, this.height);
             this.#auxilaryCanvasCTX.beginPath();
-            // this.#auxilaryCanvasCTX.lineCap = "round";
             this.#auxilaryCanvasCTX.moveTo(lastPosition.x, lastPosition.y);
             this.#auxilaryCanvasCTX.lineTo(currentPosition.x, currentPosition.y);
             this.#auxilaryCanvasCTX.stroke();
@@ -200,26 +214,26 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.#currentLayer.canvasNode.addEventListener("mousemove", drawLinePrev);
+            this.currentLayer.canvasNode.addEventListener("mousemove", drawLinePrev);
         }
 
         //Drawing line in main canvas and removing drawing preview of the line
         //on the auxilary canvas
         const handleMouseUp = (event) => {
+            this.#auxilaryCanvasCTX.clearRect(0, 0, this.width, this.height);
+
             const currentPosition = this.#extractPosition(event);
 
-            this.#currentLayer.canvasCTX.beginPath();
-            // currentPosition.canvasCTX.lineCap = "round";
-            this.#currentLayer.canvasCTX.moveTo(lastPosition.x, lastPosition.y);
-            this.#currentLayer.canvasCTX.lineTo(currentPosition.x, currentPosition.y);
-            this.#currentLayer.canvasCTX.stroke();
+            this.currentLayer.canvasCTX.beginPath();
+            this.currentLayer.canvasCTX.moveTo(lastPosition.x, lastPosition.y);
+            this.currentLayer.canvasCTX.lineTo(currentPosition.x, currentPosition.y);
+            this.currentLayer.canvasCTX.stroke();
 
-            this.#currentLayer.canvasNode.removeEventListener("mousemove", drawLinePrev);
+            this.currentLayer.canvasNode.removeEventListener("mousemove", drawLinePrev);
         }
         
-        this.#currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-
-        this.#currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
 
         this.#eventFunctions.mousedown = handleMouseDown;
         this.#eventFunctions.mouseup = handleMouseUp;
@@ -227,6 +241,7 @@ class Canvas{
 
     drawRectMode(){
         var lastPosition;
+        this.currentLayer.canvasCTX.lineCap = "square";
 
         //Drawing rect from stored position to mouse position on
         //auxilary canvas
@@ -247,28 +262,29 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.#currentLayer.canvasNode.addEventListener("mousemove", drawRectPrev);
+            this.currentLayer.canvasNode.addEventListener("mousemove", drawRectPrev);
         }
 
         //Drawing rect in main canvas and removing drawing preview of the rect
         //on the auxilary canvas
         const handleMouseUp = (event) => {
+            this.#auxilaryCanvasCTX.clearRect(0, 0, this.width, this.height);
+
             const currentPosition = this.#extractPosition(event);
             const rectSize = {
                 width: currentPosition.x - lastPosition.x,
                 height: currentPosition.y - lastPosition.y
             }
 
-            this.#currentLayer.canvasCTX.beginPath();
-            this.#currentLayer.canvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
-            this.#currentLayer.canvasCTX.stroke();
+            this.currentLayer.canvasCTX.beginPath();
+            this.currentLayer.canvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
+            this.currentLayer.canvasCTX.stroke();
 
-            this.#currentLayer.canvasCTX.removeEventListener("mousemove", drawRectPrev);
+            this.currentLayer.canvasNode.removeEventListener("mousemove", drawRectPrev);
         }
         
-        this.#currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-
-        this.#currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
 
         this.#eventFunctions.mousedown = handleMouseDown;
         this.#eventFunctions.mouseup = handleMouseUp;
@@ -276,8 +292,8 @@ class Canvas{
 
     //Removing events from canvas
     clearMode(){
-        this.#currentLayer.canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
-        this.#currentLayer.canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);
+        this.currentLayer.canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
+        this.currentLayer.canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);
     }
 }
 

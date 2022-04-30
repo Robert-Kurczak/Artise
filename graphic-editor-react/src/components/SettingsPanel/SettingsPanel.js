@@ -1,14 +1,17 @@
 import "../../styles/SettingsPanel.css"
 
 import SectionStripe from "../SectionStripe";
-import ToolSettingSection from "./ToolSettingSection";
+import LayersSection from "./LayersSection/LayersSection";
+import ToolSettingsSection from "./ToolSettingsSection";
 
 function SettingsPanel(props){
 	return(
 		<div className="panel settings">
-			<ToolSettingSection toolName={props.toolName}/>
+			<ToolSettingsSection toolName={props.toolName}/>
+
 			<SectionStripe/>
-			<div className="layer_section"></div>
+
+			<LayersSection/>
 		</div>
 	);
 }

@@ -1,7 +1,10 @@
+import "../styles/icons.css"
+
 import "../styles/App.css"
 
-import UpperPanel from "./UpperPanel/UpperPanel"
+import UpperPanel from "./UpperPanel/UpperPanel";
 import TabsStructure from "./UpperPanel/Tabs/TabsStructure";
+import DefaultScreen from "./DefaultScreen/DefaultScreen";
 import ToolsPanel from "./ToolsPanel/ToolsPanel"
 import DocumentCreator from "./DocumentCreator/DocumentCreator";
 import DocumentEditor from "./DocumentCreator/DocumentEditor";
@@ -55,13 +58,21 @@ function App(){
                 <TabsStructure hooks={hooksForTabs}/>
             </UpperPanel>
 
-            <ToolsPanel
-                setColorPicker={setColorPicker}
-            />
+            {mainCanvas == null &&
+                <DefaultScreen/>
+            }
 
-            <SettingsPanel
-                toolName={currentTool ? currentTool.toolName : ""}
-            />
+            {mainCanvas &&
+                <ToolsPanel
+                    setColorPicker={setColorPicker}
+                />
+            }
+            
+            {mainCanvas &&
+                <SettingsPanel
+                    toolName={currentTool ? currentTool.toolName : ""}
+                />
+            }
             
             {showDocumentCreator &&
                 <DocumentCreator

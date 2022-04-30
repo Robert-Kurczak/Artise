@@ -17,7 +17,8 @@ class Canvas{
         mouseup: null
     }
 
-    currentLayer;
+    //Index of currently selected layer
+    currentLayerIndex;
 
     width;
     height;
@@ -27,59 +28,67 @@ class Canvas{
         const layer = document.createElement("canvas");
         layer.width = this.width;
         layer.height = this.height;
-        layer.style = `position: absolute; z-index: ${this.layers.length + 10}`;
+        layer.style = `position: absolute; z-index: ${this.layers.length + this.#LAYER_NUM_OFFSET}`;
         layer.setAttribute("id", "layer" + this.layers.length);
 
         //Important structure for whole class
         //I guess it should be declared in some better way
         const layerObj = {
-            id: this.layers.length,
             canvasNode: layer,
             canvasCTX: layer.getContext("2d")
         };
 
         this.layers.push(layerObj);
         this.#canvasWrapper.appendChild(layer);
-
-        // this.currentLayer = layerObj;
     }
 
-    changeLayer(layerID){
-        // if(layerID >= this.layers.length) return;
+    changeLayer(layerIndex){
+        const prevLayerID = this.currentLayerIndex;
 
-        const prevLayerID = this.currentLayer.id;
-        
         //---Cleaning previous layer---
-        this.currentLayer.canvasNode.style.zIndex = this.currentLayer.id + this.#LAYER_NUM_OFFSET;  //Moving layer to the back
+        this.layers[prevLayerID].canvasNode.style.zIndex = prevLayerID + this.#LAYER_NUM_OFFSET;  //Moving layer to the back
         this.clearMode();   //Removing events from layer
         //------
 
         //Sellecting new layer
-        this.currentLayer = this.layers[layerID];
-        this.currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
+        this.currentLayerIndex = layerIndex;
+        const currentLayer = this.layers[this.currentLayerIndex];
+
+        currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
 
         //---Attaching current mode events to the new layer---
         //TODO - Redundant code
-        this.currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
-        this.currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
+        currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
+        currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
         //------
 
         //---Moving settings from previous layer to current---
-        this.currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
-        this.currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
+        currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
+        currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
         //------
     }
 
-    removeLayer(layerID){
-        this.layers.splice(layerID, 1);
+    removeLayer(layerIndex){
+        this.layers[layerIndex].canvasNode.remove();
+
+        if(layerIndex === this.currentLayerIndex){
+            const newIndex = layerIndex - 1 >= 0 ? layerIndex - 1 : layerIndex + 1
+            
+            this.changeLayer(newIndex);
+        }
+
+        //If layer under current active layer is being removed I have to decrement currentLayerIndex
+        if(layerIndex <= this.currentLayerIndex) this.currentLayerIndex--;
+
+        this.layers.splice(layerIndex, 1);
     }
 
-    hideLayer(layerID){
-        this.layers[layerID].canvasNode.style.display = "none";
+    hideLayer(layerIndex){
+        this.layers[layerIndex].canvasNode.style.opacity = 0;
     }
 
-    showLayer(layerID){
-        this.layers[layerID].canvasNode.style.display = "block";
+    showLayer(layerIndex){
+        this.layers[layerIndex].canvasNode.style.opacity = 1;
     }
 
     constructor(wrapperID, width, height){
@@ -99,12 +108,13 @@ class Canvas{
         //At the time of constructing currentLayer is not set
         //Instead of writing code in changeLayers for this specific case
         //I initialize layer here
-        this.currentLayer = this.layers[0];
-        this.currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;
+        this.currentLayerIndex = 0;
+        const currentLayer = this.layers[this.currentLayerIndex];
+        currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;
         //------
 
         //---Creating auxilary canvas---
-        this.#auxilaryCanvas = this.currentLayer.canvasNode.cloneNode();
+        this.#auxilaryCanvas = currentLayer.canvasNode.cloneNode();
         this.#auxilaryCanvas.style = `position: absolute; z-index: ${this.#MAX_LAYER + 1}; pointer-events: none;`;
         this.#auxilaryCanvas.setAttribute("id", "auxilary-canvas");
         this.#auxilaryCanvasCTX = this.#auxilaryCanvas.getContext("2d");
@@ -141,27 +151,27 @@ class Canvas{
     }
 
     setColor(color){
-        this.currentLayer.canvasCTX.strokeStyle = color;
+        this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
         this.#auxilaryCanvasCTX.strokeStyle = color;
     }
 
     setBrushSize(size){
         if(size > 0){
-            this.currentLayer.canvasCTX.lineWidth = size;
+            this.layers[this.currentLayerIndex].canvasCTX.lineWidth = size;
             this.#auxilaryCanvasCTX.lineWidth = size;
         }
     }
 
     getBrushSize(){
-        return this.currentLayer.canvasCTX.lineWidth
+        return this.layers[this.currentLayerIndex].canvasCTX.lineWidth
     }
 
     setDrawMode(mode){
         var lastPosition;
+        this.layers[this.currentLayerIndex].canvasCTX.lineCap = "round";
 
-        this.currentLayer.canvasCTX.lineCap = "round";
         const brushDraw = (event) => {
-            const layerCTX = this.currentLayer.canvasCTX;
+            const layerCTX = this.layers[this.currentLayerIndex].canvasCTX;
 
             layerCTX.beginPath();
             layerCTX.moveTo(lastPosition.x, lastPosition.y);
@@ -179,15 +189,15 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.currentLayer.canvasNode.addEventListener("mousemove", drawingMethod);
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawingMethod);
         }
 
         const handleMouseUp = () => {
-            this.currentLayer.canvasNode.removeEventListener("mousemove", drawingMethod);
+            this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousemove", drawingMethod);
         }
 
-        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mouseup", handleMouseUp);
 
         //Maybe move to it layer object?
         this.#eventFunctions.mousedown = handleMouseDown;
@@ -196,7 +206,7 @@ class Canvas{
 
     drawLineMode(){
         var lastPosition;
-        this.currentLayer.canvasCTX.lineCap = "square";
+        this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
 
         //Drawing line from stored position to mouse position on
         //auxilary canvas
@@ -214,7 +224,7 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.currentLayer.canvasNode.addEventListener("mousemove", drawLinePrev);
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawLinePrev);
         }
 
         //Drawing line in main canvas and removing drawing preview of the line
@@ -224,16 +234,16 @@ class Canvas{
 
             const currentPosition = this.#extractPosition(event);
 
-            this.currentLayer.canvasCTX.beginPath();
-            this.currentLayer.canvasCTX.moveTo(lastPosition.x, lastPosition.y);
-            this.currentLayer.canvasCTX.lineTo(currentPosition.x, currentPosition.y);
-            this.currentLayer.canvasCTX.stroke();
+            this.layers[this.currentLayerIndex].canvasCTX.beginPath();
+            this.layers[this.currentLayerIndex].canvasCTX.moveTo(lastPosition.x, lastPosition.y);
+            this.layers[this.currentLayerIndex].canvasCTX.lineTo(currentPosition.x, currentPosition.y);
+            this.layers[this.currentLayerIndex].canvasCTX.stroke();
 
-            this.currentLayer.canvasNode.removeEventListener("mousemove", drawLinePrev);
+            this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousemove", drawLinePrev);
         }
         
-        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mouseup", handleMouseUp);
 
         this.#eventFunctions.mousedown = handleMouseDown;
         this.#eventFunctions.mouseup = handleMouseUp;
@@ -241,7 +251,8 @@ class Canvas{
 
     drawRectMode(){
         var lastPosition;
-        this.currentLayer.canvasCTX.lineCap = "square";
+
+        this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
 
         //Drawing rect from stored position to mouse position on
         //auxilary canvas
@@ -262,7 +273,7 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.currentLayer.canvasNode.addEventListener("mousemove", drawRectPrev);
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawRectPrev);
         }
 
         //Drawing rect in main canvas and removing drawing preview of the rect
@@ -276,15 +287,15 @@ class Canvas{
                 height: currentPosition.y - lastPosition.y
             }
 
-            this.currentLayer.canvasCTX.beginPath();
-            this.currentLayer.canvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
-            this.currentLayer.canvasCTX.stroke();
+            this.layers[this.currentLayerIndex].canvasCTX.beginPath();
+            this.layers[this.currentLayerIndex].canvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
+            this.layers[this.currentLayerIndex].canvasCTX.stroke();
 
-            this.currentLayer.canvasNode.removeEventListener("mousemove", drawRectPrev);
+            this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousemove", drawRectPrev);
         }
         
-        this.currentLayer.canvasNode.addEventListener("mousedown", handleMouseDown);
-        this.currentLayer.canvasNode.addEventListener("mouseup", handleMouseUp);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousedown", handleMouseDown);
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("mouseup", handleMouseUp);
 
         this.#eventFunctions.mousedown = handleMouseDown;
         this.#eventFunctions.mouseup = handleMouseUp;
@@ -292,8 +303,8 @@ class Canvas{
 
     //Removing events from canvas
     clearMode(){
-        this.currentLayer.canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
-        this.currentLayer.canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);
+        this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
+        this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);
     }
 }
 

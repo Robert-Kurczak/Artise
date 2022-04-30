@@ -1,37 +1,50 @@
 import "../../../../styles/LayerNode.css"
 
 import LayerColor from "./LayerColor";
-import LayerRemove from "./LayerRemove";
-
-import { GlobalContext } from "../../../App";
-import { useContext } from "react";
+import RemoveLayerBtn from "./RemoveLayerBtn";
 
 function LayerNode(props){
-    const { layerID, active, setActiveLayer} = props;
-    const { mainCanvas } = useContext(GlobalContext);
+    const {
+        active,
+        updateActiveLayer,
+        layerIndex,
 
-    function changeLayer(ID){
+        hideLayer,
+        showLayer,
+
+        changeLayer,
+
+        removeLayer,
+        updateLayersAmount
+    } = props;
+
+    const changeLayerToThis = () => {
         if(active) return;
         
-        mainCanvas.changeLayer(ID);
-        setActiveLayer(ID);
+        changeLayer();
+        updateActiveLayer();
     }
-
-    function showLayer(ID){mainCanvas.showLayer(ID)}
-
-    function hideLayer(ID){mainCanvas.hideLayer(ID)}
 
     const style = active? {backgroundColor: "#141414"} : null;
 
     return(
-        <div className="layer_node" onClick={() => {changeLayer(layerID)}} style={style}>
+        <div className="layer_node" onClick={changeLayerToThis} style={style}>
             <LayerColor
-                showLayer={() => {showLayer(layerID)}}
-                hideLayer={() => {hideLayer(layerID)}}
+                showLayer={showLayer}
+                hideLayer={hideLayer}
             />
 
-            <p>Layer {layerID}</p>
-            <LayerRemove/>
+            <p>Layer {layerIndex}</p>
+            
+            <RemoveLayerBtn
+                active={active}
+                layerIndex={layerIndex}
+
+                updateActiveLayer={updateActiveLayer}
+                removeLayer={removeLayer}
+                updateLayersAmount={updateLayersAmount}
+            />
+
         </div>
     );
 }

@@ -2,5 +2,10 @@
     width: 15%;
     aspect-ratio: 1;
     border-radius: 25%;
+    transition-duration: 0.3s;
     cursor: pointer;
+}
+
+.layer_color:hover{
+    border-radius: 40%;
 }

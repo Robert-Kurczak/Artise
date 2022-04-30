@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
 import "../../../../styles/LayerColor.css"
+
+import { useRef, useState } from "react";
 
 //Max value - 240
 //Min value - 100

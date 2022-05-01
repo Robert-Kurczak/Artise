@@ -28,8 +28,8 @@ class Canvas{
         const layer = document.createElement("canvas");
         layer.width = this.width;
         layer.height = this.height;
-        layer.style = `position: absolute; z-index: ${this.layers.length + this.#LAYER_NUM_OFFSET}`;
-        layer.setAttribute("id", "layer" + this.layers.length);
+        layer.style = "position: absolute; pointer-events: none;";
+        // layer.setAttribute("id", "layer" + this.layers.length);
 
         //Important structure for whole class
         //I guess it should be declared in some better way
@@ -46,7 +46,7 @@ class Canvas{
         const prevLayerID = this.currentLayerIndex;
 
         //---Cleaning previous layer---
-        this.layers[prevLayerID].canvasNode.style.zIndex = prevLayerID + this.#LAYER_NUM_OFFSET;  //Moving layer to the back
+        this.layers[prevLayerID].canvasNode.style.pointerEvents = "none";  //Moving layer to the back
         this.clearMode();   //Removing events from layer
         //------
 
@@ -54,7 +54,9 @@ class Canvas{
         this.currentLayerIndex = layerIndex;
         const currentLayer = this.layers[this.currentLayerIndex];
 
-        currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
+        currentLayer.canvasNode.style.pointerEvents = "auto";
+
+        // currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
 
         //---Attaching current mode events to the new layer---
         //TODO - Redundant code
@@ -101,25 +103,27 @@ class Canvas{
         this.#canvasWrapper.style = `width: ${width}px; height: ${height}px`;
         //------
 
+        //---Creating auxilary canvas---
+        this.#auxilaryCanvas = document.createElement("canvas");
+        this.#auxilaryCanvas.width = this.width;
+        this.#auxilaryCanvas.height = this.height;
+        this.#auxilaryCanvas.style = "position: absolute; pointer-events: none;";
+        this.#auxilaryCanvas.setAttribute("id", "auxilary-canvas");
+        this.#auxilaryCanvasCTX = this.#auxilaryCanvas.getContext("2d");
+
+        this.#canvasWrapper.appendChild(this.#auxilaryCanvas);
+        //------
+
         //---Creating main layer---
         this.addLayer();
 
-        //changeLayers bases on currentLayer property.
+        //changeLayers bases on currentLayerIndex property.
         //At the time of constructing currentLayer is not set
         //Instead of writing code in changeLayers for this specific case
         //I initialize layer here
         this.currentLayerIndex = 0;
         const currentLayer = this.layers[this.currentLayerIndex];
-        currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;
-        //------
-
-        //---Creating auxilary canvas---
-        this.#auxilaryCanvas = currentLayer.canvasNode.cloneNode();
-        this.#auxilaryCanvas.style = `position: absolute; z-index: ${this.#MAX_LAYER + 1}; pointer-events: none;`;
-        this.#auxilaryCanvas.setAttribute("id", "auxilary-canvas");
-        this.#auxilaryCanvasCTX = this.#auxilaryCanvas.getContext("2d");
-
-        this.#canvasWrapper.appendChild(this.#auxilaryCanvas);
+        currentLayer.canvasNode.style.pointerEvents = "auto";
         //------
         
         this.#canvasBoundingRect = this.#canvasWrapper.getBoundingClientRect();
@@ -135,8 +139,6 @@ class Canvas{
 
         this.addLayer();
         this.addLayer();
-        // this.changeLayer(1);
-        // this.changeLayer(0);
         //------
     }
 
@@ -206,7 +208,9 @@ class Canvas{
 
     drawLineMode(){
         var lastPosition;
+
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
+        this.#auxilaryCanvasCTX.lineCap = "square";
 
         //Drawing line from stored position to mouse position on
         //auxilary canvas
@@ -251,7 +255,6 @@ class Canvas{
 
     drawRectMode(){
         var lastPosition;
-
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
 
         //Drawing rect from stored position to mouse position on

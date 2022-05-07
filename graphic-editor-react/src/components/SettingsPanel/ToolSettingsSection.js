@@ -5,10 +5,12 @@ function ToolSettingsSection(props){
 
 	return(
 		<div className="tool_setting_section">
-			{/* Brush I would really prefer to just pass the component */}
-			{toolName === "brush" && <BrushSettings/>}
-			{/* {toolName === "line" && <LineSettings/>}
-			{toolName === "rect" && <RectSettings/>} */}
+			{/* Bruh, I would really prefer to just pass the component */}
+			{toolName === "brush" && <BrushSettings label="Brush"/>}
+			{toolName === "line" && <BrushSettings label="Line"/>}
+			{toolName === "circle" && <BrushSettings label="Circle"/>}
+			{toolName === "rectangle" && <BrushSettings label="Rect"/>}
+			{/* {toolName === "rect" && <RectSettings/>} */}
 		</div>
 	);
 }

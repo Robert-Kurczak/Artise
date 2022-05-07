@@ -1,7 +1,7 @@
 import { GlobalContext } from "../../App";
 import { useContext } from "react";
 
-function BrushSettings(){
+function BrushSettings(props){
 	const { mainCanvas } = useContext(GlobalContext);
 
 	const updateBrush = (e) => {
@@ -10,7 +10,7 @@ function BrushSettings(){
 
 	return(
 		<>
-			<p>Brush size: </p>
+			<p>{props.label} size: </p>
 			<input type="number" min={1} defaultValue={mainCanvas.getBrushSize()} onChange={updateBrush}></input>
 		</>
 	);

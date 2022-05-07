@@ -26,7 +26,6 @@ class Tool {
 //based on given tool's name
 
 //Maybe there's some workaround
-
 function Tools() {
 	const { mainCanvas, currentTool, setCurrentTool } = useContext(GlobalContext);
 
@@ -167,6 +166,21 @@ function Tools() {
 	);
 	/* #endregion */
 
+	/* #region Circle */
+	const circleTool = new Tool(
+		"circle",
+		"circle",
+		//Enable
+		() => {
+			mainCanvas.drawCircleMode();
+		},
+		//Disable
+		() => {
+			mainCanvas.clearMode();
+		}
+	);
+	/* #endregion */
+
 	/* #region  Text */
 	const textTool = new Tool(
 		"text",
@@ -190,7 +204,8 @@ function Tools() {
 		fillTool,
 		gradientTool,
 		lineTool,
-		rectangleTool
+		rectangleTool,
+		circleTool
 	];
 
 	const icons = tools.map((toolObj, index) =>

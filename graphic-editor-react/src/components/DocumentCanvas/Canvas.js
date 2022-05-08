@@ -121,29 +121,27 @@ class Canvas{
     changeLayer(layerIndex){
         const prevLayerID = this.currentLayerIndex;
 
-        //---Cleaning previous layer---
-        this.layers[prevLayerID].canvasNode.style.pointerEvents = "none";  //Moving layer to the back
-        this.clearMode();   //Removing events from layer
-        //------
-
         //Selecting new layer
         this.currentLayerIndex = layerIndex;
         const currentLayer = this.layers[this.currentLayerIndex];
 
         currentLayer.canvasNode.style.pointerEvents = "auto";
-
-        // currentLayer.canvasNode.style.zIndex = this.#MAX_LAYER;    //Moving layer to the front
-
-        //---Attaching current mode events to the new layer---
-        //TODO - Redundant code
-        currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
-        currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
+        
+        //---Cleaning previous layer---
+        this.layers[prevLayerID].canvasNode.style.pointerEvents = "none";  //Moving layer to the back
+        this.clearMode();   //Removing events from layer
         //------
-
+        
         //---Moving settings from previous layer to current---
         currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
         currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
         currentLayer.canvasCTX.lineCap = this.layers[prevLayerID].canvasCTX.lineCap;
+        currentLayer.canvasCTX.globalCompositeOperation = this.layers[prevLayerID].canvasCTX.globalCompositeOperation;
+        //------
+
+        //---Attaching current mode events to the new layer---
+        currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
+        currentLayer.canvasNode.addEventListener("mousedown", this.#eventFunctions.mousedown);
         //------
     }
 
@@ -201,9 +199,11 @@ class Canvas{
         return this.layers[this.currentLayerIndex].canvasCTX.lineWidth;
     }
 
-    setDrawMode(mode){
+    drawMode(mode, compositeOperation="source-over"){
         var lastPosition;
+        
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "round";
+        this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = compositeOperation;
 
         const brushDraw = (event) => {
             const layerCTX = this.layers[this.currentLayerIndex].canvasCTX;
@@ -383,7 +383,8 @@ class Canvas{
         this.#eventFunctions.mouseup = handleMouseUp;
     }
 
-    bucketFill(){
+    bucketFillMode(active=true){
+
         function getPixel(imageData, x, y){
             if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) return [-1, -1, -1, -1];
 
@@ -462,7 +463,7 @@ class Canvas{
         this.#eventFunctions.click = fill;
     }
 
-    //Removing events from canvas
+    //
     clearMode(){
         this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
         this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);

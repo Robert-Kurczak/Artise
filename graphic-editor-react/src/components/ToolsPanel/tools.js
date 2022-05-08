@@ -26,6 +26,7 @@ class Tool {
 //based on given tool's name
 
 //Maybe there's some workaround
+//TODO move to other icon font
 function Tools() {
 	const { mainCanvas, currentTool, setCurrentTool } = useContext(GlobalContext);
 
@@ -47,7 +48,7 @@ function Tools() {
 		"brush",
 		//Enable
 		() => {
-			mainCanvas.setDrawMode("brush");
+			mainCanvas.drawMode("brush");
 		},
 		//Disable
 		() => {
@@ -71,6 +72,21 @@ function Tools() {
 	);
 	/* #endregion */
 
+	/* #region Eraser */
+	const eraserTool = new Tool(
+		"eraser",
+		"clear",
+		//Enable
+		() => {
+			mainCanvas.drawMode("brush", "destination-out")
+		},
+		//Disable
+		() => {
+			mainCanvas.clearMode();
+		}
+	);
+	/* #endregion */
+
 	/* #region  Eyedropper */
 	const eyedropperTool = new Tool(
 		"eyedropper",
@@ -88,9 +104,11 @@ function Tools() {
 	const fillTool = new Tool(
 		"fill",
 		"format_color_fill",
+		//Enable
 		() => {
-			mainCanvas.bucketFill();
+			mainCanvas.bucketFillMode();
 		},
+		//Disable
 		() => {
 			mainCanvas.clearMode();
 		}
@@ -201,6 +219,7 @@ function Tools() {
 		textTool,
 		brushTool,
 		pencilTool,
+		eraserTool,
 		fillTool,
 		gradientTool,
 		lineTool,

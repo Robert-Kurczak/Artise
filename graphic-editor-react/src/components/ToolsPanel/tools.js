@@ -89,10 +89,10 @@ function Tools() {
 		"fill",
 		"format_color_fill",
 		() => {
-			//On
+			mainCanvas.bucketFill();
 		},
 		() => {
-			//Off
+			mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */

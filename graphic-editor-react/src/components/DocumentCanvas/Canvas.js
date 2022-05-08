@@ -28,6 +28,16 @@ class Canvas{
 
     layers = [];
 
+    //Extract clicked, relative to canvas, position from event
+    #extractPosition(event){
+        const currentPosition = {
+            x: Math.floor((event.clientX - this.#canvasBoundingRect.left) * this.#scaleDivisor),
+            y: Math.floor((event.clientY - this.#canvasBoundingRect.top) * this.#scaleDivisor)
+        };
+
+        return currentPosition;
+    }
+
     //Compute scale divisor so the canvas can properly fit on screen
     //while maintaining it's resolution
     setScale(){
@@ -160,19 +170,24 @@ class Canvas{
         this.layers[layerIndex].canvasNode.style.opacity = 1;
     }
 
-    //Extract clicked, relative to canvas, position from event
-    #extractPosition(event){
-        const currentPosition = {
-            x: (event.clientX - this.#canvasBoundingRect.left) * this.#scaleDivisor,
-            y: (event.clientY - this.#canvasBoundingRect.top) * this.#scaleDivisor
-        };
-
-        return currentPosition;
-    }
-
     setColor(color){
         this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
         this.#auxilaryCanvasCTX.strokeStyle = color;
+    }
+
+    //TODO better validation
+    getColorRGBA(){
+        var currentColor = this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
+
+        //rgba(r, g, b, a) to [r, g, b, a]
+        if(currentColor[0] === "r"){
+            return currentColor.substr(5).slice(0, -1).split(",").map((str) => parseInt(str));
+        }
+        //#ff0044 to [255, 0, 44, 255]
+        else{
+            currentColor += "ff";
+            return currentColor.slice(1).match(/.{1,2}/g).map((str) => parseInt("0x" + str));
+        }
     }
 
     setBrushSize(size){
@@ -368,10 +383,90 @@ class Canvas{
         this.#eventFunctions.mouseup = handleMouseUp;
     }
 
+    bucketFill(){
+        function getPixel(imageData, x, y){
+            if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) return [-1, -1, -1, -1];
+
+            const startIndex = (y * imageData.width + x) * 4
+    
+            return imageData.data.slice(startIndex, startIndex + 4);
+        }
+
+        function setPixel(imageData, x, y, value){
+            const startIndex = (y * imageData.width + x) * 4
+    
+            imageData.data[startIndex + 0] = value[0];
+            imageData.data[startIndex + 1] = value[1];
+            imageData.data[startIndex + 2] = value[2];
+            imageData.data[startIndex + 3] = value[3];
+        }
+
+        function pixelsSimilarity(p1, p2){
+            return p1[0] === p2[0] && p1[1] === p2[1] && p1[2] === p2[2] && p1[3] === p2[3];
+        }
+
+        const fill = (event) => {
+            const fillColor = this.getColorRGBA();
+            const imageData = this.layers[this.currentLayerIndex].canvasCTX.getImageData(0, 0, this.canvasResolution.x, this.canvasResolution.y);
+            const clickedPosition = this.#extractPosition(event);
+            const clickedColor = getPixel(imageData, clickedPosition.x, clickedPosition.y);
+
+           if(pixelsSimilarity(clickedColor, fillColor)) return; 
+
+            var positionStack = [Object.assign({}, clickedPosition)];
+
+            while(positionStack.length){
+                //Getting position from the top of pixelStack
+                const initialPosition = positionStack.pop();
+
+                const nextPosition = Object.assign({}, initialPosition);
+                while(pixelsSimilarity(clickedColor, getPixel(imageData, nextPosition.x, nextPosition.y))){
+                    //going up if possible
+                    nextPosition.y--;
+                }
+                nextPosition.y++;
+                
+                var reachLeft = false;
+                var reachRight = false;
+                do{
+                    if(pixelsSimilarity(clickedColor, getPixel(imageData, nextPosition.x - 1, nextPosition.y))){
+                        if(!reachLeft){
+                            reachLeft = true;
+                            positionStack.push({x: nextPosition.x - 1, y: nextPosition.y});
+                        }
+                    }
+                    else{
+                        reachLeft = false;
+                    }
+
+                    if(pixelsSimilarity(clickedColor, getPixel(imageData, nextPosition.x + 1, nextPosition.y))){
+                        if(!reachRight){
+                            reachRight = true;
+                            positionStack.push({x: nextPosition.x + 1, y: nextPosition.y});
+                        }
+                    }
+                    else{
+                        reachRight = false;
+                    }
+
+                    setPixel(imageData, nextPosition.x, nextPosition.y, fillColor);
+                    nextPosition.y++;
+                }
+                while(pixelsSimilarity(clickedColor, getPixel(imageData, nextPosition.x, nextPosition.y)));
+            }
+
+            this.layers[this.currentLayerIndex].canvasCTX.putImageData(imageData, 0, 0);
+        }
+
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("click", fill);
+        this.#eventFunctions.click = fill;
+    }
+
     //Removing events from canvas
     clearMode(){
         this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousedown", this.#eventFunctions.mousedown);
         this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mouseup", this.#eventFunctions.mouseup);
+        this.layers[this.currentLayerIndex].canvasNode.removeEventListener("click", this.#eventFunctions.click);
     }
 }
 

@@ -28,7 +28,7 @@ class Tool {
 //Maybe there's some workaround
 //TODO move to other icon font
 function Tools() {
-	const { mainCanvas, currentTool, setCurrentTool } = useContext(GlobalContext);
+	const { mainCanvas, colorPicker, currentTool, setCurrentTool } = useContext(GlobalContext);
 
 	const switchTool = (tool) => {
 		if(currentTool){
@@ -63,16 +63,16 @@ function Tools() {
 		"edit",
 		//Enable
 		() => {
-			// mainCanvas.setDrawMode("brush");
+			mainCanvas.drawMode("pencil");
 		},
 		//Disable
 		() => {
-			// mainCanvas.clearMode();
+			mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */
 
-	/* #region Eraser */
+	/* #region  Eraser */
 	const eraserTool = new Tool(
 		"eraser",
 		"clear",
@@ -88,14 +88,22 @@ function Tools() {
 	/* #endregion */
 
 	/* #region  Eyedropper */
+	const updateColor = () => {
+		colorPicker.setColor(mainCanvas.getColor());
+	}
+
 	const eyedropperTool = new Tool(
 		"eyedropper",
 		"colorize",
+		//Enable
 		() => {
-			//On
+			mainCanvas.eyedropperMode(true);
+			mainCanvas.canvasWrapper.addEventListener("click", updateColor);
 		},
+		//Disable
 		() => {
-			//Off
+			mainCanvas.clearMode();
+			mainCanvas.canvasWrapper.removeEventListener("click", updateColor);
 		}
 	);
 	/* #endregion */

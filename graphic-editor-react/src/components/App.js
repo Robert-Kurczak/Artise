@@ -47,6 +47,8 @@ function App(){
     const GlobalContextContent = {
         mainCanvas,
 
+        colorPicker,
+
         currentTool,
         setCurrentTool
     };

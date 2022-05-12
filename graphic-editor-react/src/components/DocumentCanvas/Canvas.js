@@ -29,7 +29,7 @@ class Canvas{
     canvasResolution = {x: 0, y: 0};
     
     layers = [];
-    
+
     //Extract clicked, relative to canvas, position from event
     #extractPosition(event){
         const currentPosition = {
@@ -144,26 +144,33 @@ class Canvas{
         this.canvasWrapper.appendChild(layer);
     }
 
+    #moveSettings(prevLayer, newLayer){
+        newLayer.canvasCTX.lineWidth = prevLayer.canvasCTX.lineWidth;
+        newLayer.canvasCTX.strokeStyle = prevLayer.canvasCTX.strokeStyle;
+        newLayer.canvasCTX.lineCap = prevLayer.canvasCTX.lineCap;
+        newLayer.canvasCTX.globalCompositeOperation = prevLayer.canvasCTX.globalCompositeOperation;
+        
+        newLayer.canvasCTX.font = prevLayer.canvasCTX.font;
+        newLayer.canvasCTX.fillColor = prevLayer.canvasCTX.fillColor;
+    }
+
     changeLayer(layerIndex){
         const prevLayerID = this.currentLayerIndex;
-
+        
         //---Cleaning previous layer---
         this.layers[prevLayerID].canvasNode.style.pointerEvents = "none";  //Moving layer to the back
         this.clearMode();   //Removing events from layer
         //------
-
+        
         //Selecting new layer
         this.currentLayerIndex = layerIndex;
         const currentLayer = this.layers[this.currentLayerIndex];
-
-        currentLayer.canvasNode.style.pointerEvents = "auto";
         
         //---Moving settings from previous layer to current---
-        currentLayer.canvasCTX.lineWidth = this.layers[prevLayerID].canvasCTX.lineWidth;
-        currentLayer.canvasCTX.strokeStyle = this.layers[prevLayerID].canvasCTX.strokeStyle;
-        currentLayer.canvasCTX.lineCap = this.layers[prevLayerID].canvasCTX.lineCap;
-        currentLayer.canvasCTX.globalCompositeOperation = this.layers[prevLayerID].canvasCTX.globalCompositeOperation;
+        this.#moveSettings(this.layers[prevLayerID], currentLayer);
         //------
+
+        currentLayer.canvasNode.style.pointerEvents = "auto";
 
         //---Attaching current mode events to the new layer---
         currentLayer.canvasNode.addEventListener("mouseup", this.#eventFunctions.mouseup);
@@ -201,6 +208,38 @@ class Canvas{
 
     getColor(){
         return this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
+    }
+
+    setFontSize(size){
+        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
+        currentCTX.font = currentCTX.font.replace(/\d+px/, `${size}px`);
+    }
+
+    getFontSize(){
+        const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
+        const pxIndex = currentFont.indexOf("px");
+
+        return currentFont.substr(pxIndex - 2, pxIndex);
+    }
+
+    setFontFamily(fontFamily){
+        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
+
+        currentCTX.font.replace(currentCTX.font.substr(currentCTX.font.indexOf("px") + 3), fontFamily);
+    }
+
+    getFontFamily(){
+        const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
+
+        return currentFont.substring(currentFont.indexOf("px") + 3);
+    }
+
+    setFillColor(color){
+        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
+    }
+
+    getFillColor(){
+        return this.layers[this.currentLayerIndex].canvasCTX.fillStyle;
     }
 
     //TODO better validation
@@ -507,6 +546,46 @@ class Canvas{
         this.layers[this.currentLayerIndex].canvasNode.addEventListener("click", eyedrop);
 
         this.#eventFunctions.click = eyedrop;
+    }
+
+    textMode(){
+        const startAddingText = (event) => {
+            const clickedPosition = this.#extractPosition(event);
+
+            const textArea = document.createElement("textarea");
+
+            const fontFamily = this.getFontFamily();
+            const fontSize = this.getFontSize();
+            const fontColor = this.getFillColor();
+
+            console.log(fontSize, fontColor);
+
+            textArea.style = `
+                position: absolute;
+                left: ${clickedPosition.x}px;
+                top: ${clickedPosition.y}px;
+                background-color: rgba(0, 0, 0, 0);
+                border: 2px solid #141414;
+
+                font-family: ${fontFamily};
+                font-size: ${fontSize}px;
+                color: ${fontColor};
+            `;
+
+            
+            textArea.addEventListener("focusout", () => {
+                this.layers[this.currentLayerIndex].canvasCTX.fillText(textArea.value, clickedPosition.x, clickedPosition.y);
+                textArea.remove();
+            }, {once: true});
+            
+            this.canvasWrapper.appendChild(textArea);
+            
+            textArea.focus();
+        }
+
+        //Wait for click on canvas
+        this.layers[this.currentLayerIndex].canvasNode.addEventListener("click", startAddingText, {once: true});
+        this.#eventFunctions.click = startAddingText;
     }
 
     //Remove mode events

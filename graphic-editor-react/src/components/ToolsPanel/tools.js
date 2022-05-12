@@ -211,11 +211,13 @@ function Tools() {
 	const textTool = new Tool(
 		"text",
 		"title",
+		//Enable
 		() => {
-			//On
+			mainCanvas.textMode();
 		},
+		//Disable
 		() => {
-			//Off
+			mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */

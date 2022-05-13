@@ -558,24 +558,33 @@ class Canvas{
             const fontSize = this.getFontSize();
             const fontColor = this.getFillColor();
 
-            console.log(fontSize, fontColor);
-
             textArea.style = `
                 position: absolute;
                 left: ${clickedPosition.x}px;
                 top: ${clickedPosition.y}px;
                 background-color: rgba(0, 0, 0, 0);
                 border: 2px solid #141414;
+                padding: 0px;
 
                 font-family: ${fontFamily};
                 font-size: ${fontSize}px;
                 color: ${fontColor};
             `;
 
-            
+            //Accepting entered text
             textArea.addEventListener("focusout", () => {
-                this.layers[this.currentLayerIndex].canvasCTX.fillText(textArea.value, clickedPosition.x, clickedPosition.y);
+                const x = clickedPosition.x;
+                const y = clickedPosition.y + parseInt(fontSize);
+
+                this.layers[this.currentLayerIndex].canvasCTX.fillText(textArea.value, x, y);
                 textArea.remove();
+
+                //Starts listening for next clicks after delay
+                setTimeout(() => {
+                    this.layers[this.currentLayerIndex].canvasNode.addEventListener("click", startAddingText, {once: true});
+                    this.#eventFunctions.click = startAddingText;
+                }, 250);
+
             }, {once: true});
             
             this.canvasWrapper.appendChild(textArea);

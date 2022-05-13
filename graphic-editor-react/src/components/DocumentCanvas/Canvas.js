@@ -12,6 +12,9 @@ class Canvas{
     //It's not considered layer and therefore not construced as one.
     #auxilaryCanvas;
     #auxilaryCanvasCTX;
+
+    //Holder for inputing text before actualy drawing it on canvas
+    #textInputHolder;
     
     //For storing references to events function so they can be delete later
     #eventFunctions = {
@@ -108,6 +111,15 @@ class Canvas{
         //Get wrapper position on screen
         this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
 
+        //Initialize input holder
+        this.#textInputHolder = document.createElement("textarea");
+        this.#textInputHolder.style = `
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0);
+            border: 2px solid #141414;
+            padding: 0px;
+        `;
+
         //When the window resizes, previous bounding rect is invalid.
         //It have to be recalculated again
         window.addEventListener("resize", () => {
@@ -116,13 +128,8 @@ class Canvas{
 
         //---Some initial values---
         this.setDrawWidth(5);
-
-        document.addEventListener("keydown", (e)=>{
-            if(e.key === "t"){
-                console.log(e.key);
-                this.canvasWrapper.appendChild(this.getMergedPixel(0, 0))
-            }
-        });
+        this.setFontSize(10);
+        this.setFontFamily("Arial");
         //------
     }
 
@@ -201,9 +208,14 @@ class Canvas{
         this.layers[layerIndex].canvasNode.style.opacity = 1;
     }
 
+    //TODO better text color updating
     setColor(color){
         this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
         this.#auxilaryCanvasCTX.strokeStyle = color;
+
+        //For text
+        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
+        this.#textInputHolder.style.color = color;
     }
 
     getColor(){
@@ -211,21 +223,33 @@ class Canvas{
     }
 
     setFontSize(size){
+        var scaledSize = Math.round(size * this.#scaleDivisor);
+        
         const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
-        currentCTX.font = currentCTX.font.replace(/\d+px/, `${size}px`);
+        currentCTX.font = currentCTX.font.replace(/\d+px/, `${scaledSize}px`);
+
+        this.#textInputHolder.style.fontSize = size + "px";
     }
 
-    getFontSize(){
+    //read from input holder?
+    getFontSize(scaled=false){
         const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
         const pxIndex = currentFont.indexOf("px");
 
-        return currentFont.substr(pxIndex - 2, pxIndex);
+        const size = parseInt(currentFont.substr(pxIndex - 2, pxIndex));
+
+        if(!scaled) return Math.round(size / this.#scaleDivisor);
+        return size;
     }
 
     setFontFamily(fontFamily){
+        //Setting CTX
         const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
+        currentCTX.font = currentCTX.font.replace(currentCTX.font.substr(currentCTX.font.indexOf("px") + 3), fontFamily);
 
-        currentCTX.font.replace(currentCTX.font.substr(currentCTX.font.indexOf("px") + 3), fontFamily);
+        //Setting holder style
+        this.#textInputHolder.style.fontFamily = fontFamily;
+
     }
 
     getFontFamily(){
@@ -475,7 +499,7 @@ class Canvas{
             const clickedPosition = this.#extractPosition(event);
             const clickedColor = this.#getPixel(imageData, clickedPosition.x, clickedPosition.y);
 
-           if(pixelsSimilarity(clickedColor, fillColor)) return; 
+            if(pixelsSimilarity(clickedColor, fillColor)) return; 
 
             var positionStack = [Object.assign({}, clickedPosition)];
 
@@ -548,36 +572,28 @@ class Canvas{
         this.#eventFunctions.click = eyedrop;
     }
 
+    //TODO better calculating text position based on textarea
+    //TODO show always scaled values?
     textMode(){
         const startAddingText = (event) => {
             const clickedPosition = this.#extractPosition(event);
 
-            const textArea = document.createElement("textarea");
-
-            const fontFamily = this.getFontFamily();
-            const fontSize = this.getFontSize();
-            const fontColor = this.getFillColor();
-
-            textArea.style = `
-                position: absolute;
-                left: ${clickedPosition.x}px;
-                top: ${clickedPosition.y}px;
-                background-color: rgba(0, 0, 0, 0);
-                border: 2px solid #141414;
-                padding: 0px;
-
-                font-family: ${fontFamily};
-                font-size: ${fontSize}px;
-                color: ${fontColor};
-            `;
+            this.#textInputHolder.style.left = (clickedPosition.x / this.#scaleDivisor) + "px";
+            this.#textInputHolder.style.top = (clickedPosition.y / this.#scaleDivisor) + "px";
 
             //Accepting entered text
-            textArea.addEventListener("focusout", () => {
-                const x = clickedPosition.x;
-                const y = clickedPosition.y + parseInt(fontSize);
+            this.canvasWrapper.addEventListener("mousedown", () => {
+                const metrics = this.layers[this.currentLayerIndex].canvasCTX.measureText(this.#textInputHolder.value);
 
-                this.layers[this.currentLayerIndex].canvasCTX.fillText(textArea.value, x, y);
-                textArea.remove();
+                console.log(metrics);
+
+                const x = clickedPosition.x;
+                const y = clickedPosition.y + metrics.actualBoundingBoxAscent * this.#scaleDivisor;
+
+                this.layers[this.currentLayerIndex].canvasCTX.fillText(this.#textInputHolder.value, x, y);
+                this.#textInputHolder.value = "";
+
+                this.canvasWrapper.removeChild(this.#textInputHolder);
 
                 //Starts listening for next clicks after delay
                 setTimeout(() => {
@@ -587,9 +603,9 @@ class Canvas{
 
             }, {once: true});
             
-            this.canvasWrapper.appendChild(textArea);
+            this.canvasWrapper.appendChild(this.#textInputHolder);
             
-            textArea.focus();
+            this.#textInputHolder.focus();
         }
 
         //Wait for click on canvas

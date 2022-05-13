@@ -1,6 +1,7 @@
 import "../../styles/ToolSettingsSection.css"
 
-import DrawWidth from "./ToolsSettings/DrawWidth";
+import DrawWidth from "./ToolsSettings/CoreSettings/DrawWidth";
+import TextSettings from "./ToolsSettings/TextSettings";
 
 function ToolSettingsSection(props){
 	const toolName = props.toolName;
@@ -12,6 +13,7 @@ function ToolSettingsSection(props){
 			{toolName === "line" && <DrawWidth label="Line"/>}
 			{toolName === "circle" && <DrawWidth label="Circle"/>}
 			{toolName === "rectangle" && <DrawWidth label="Rect"/>}
+			{toolName === "text" && <TextSettings/>}
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { GlobalContext } from "../../App";
+import { GlobalContext } from "../../../App";
 import { useContext } from "react";
 
 function DrawWidth(props){

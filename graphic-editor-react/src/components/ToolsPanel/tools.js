@@ -3,7 +3,7 @@ import { GlobalContext } from "../App"
 
 import Icon from "./Icon";
 
-class Tool {
+class Tool{
 	constructor(toolName, iconName, enableFunction, disableFunction){
 		this.toolName = toolName;
 		this.iconName = iconName;
@@ -35,7 +35,6 @@ function Tools() {
 			if (currentTool.toolName === tool.toolName) return;
 			currentTool.disable();
 		}
-		
 
 		tool.enable();
 

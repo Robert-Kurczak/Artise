@@ -22,3 +22,14 @@
     font-size: 100%;
     -moz-appearance: textfield;
 }
+
+.settings select{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    height: 30px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+}

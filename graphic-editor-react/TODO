@@ -1,3 +1,4 @@
 draggable layers nodes
 highlight active tool
 better pencil
+pass mainCanvas instead of context

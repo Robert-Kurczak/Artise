@@ -6,7 +6,6 @@ import RemoveLayerBtn from "./RemoveLayerBtn";
 function LayerNode(props){
     const {
         active,
-        updateActiveLayer,
         layerIndex,
 
         hideLayer,
@@ -22,7 +21,7 @@ function LayerNode(props){
         if(active) return;
         
         changeLayer();
-        updateActiveLayer();
+        rerenderNodes()
     }
 
     const style = active ? {backgroundColor: "#141414"} : null;
@@ -40,7 +39,6 @@ function LayerNode(props){
                 active={active}
                 layerIndex={layerIndex}
 
-                updateActiveLayer={updateActiveLayer}
                 removeLayer={removeLayer}
                 rerenderNodes={rerenderNodes}
             />

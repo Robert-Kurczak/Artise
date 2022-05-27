@@ -19,7 +19,7 @@ function ColorPicker(props){
             theme: 'monolith',
             useAsButton: true,
             appClass: "color_picker_custom",
-            default: "#ffffff",
+            default: defaultColor,
         
             swatches: [
                 'rgba(244, 67, 54, 1)',
@@ -53,8 +53,6 @@ function ColorPicker(props){
 
         //Updating color preview div with selected color
         //and color in mainCanvas object
-        mainCanvas && mainCanvas.setColor(defaultColor);
-        
         pickr.on("change", (color) => {
             const rgba = color.toRGBA().toString(3);
             
@@ -62,7 +60,13 @@ function ColorPicker(props){
             setBackground(rgba);
         });
 
+        //Default values
+        mainCanvas && mainCanvas.setColor(defaultColor);
+        setBackground(defaultColor);
+
         setColorPicker(pickr);
+
+        return () => {document.getElementsByClassName("color_picker_custom")[0].remove()}
 
     }, [setColorPicker, mainCanvas]);
 

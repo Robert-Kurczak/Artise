@@ -8,11 +8,7 @@ import { useContext, useState } from "react";
 
 function LayersSection(){
     const { mainCanvas } = useContext(GlobalContext);
-
-    const [activeLayer, setActiveLayer] = useState(mainCanvas.currentLayerIndex);
     const [rerender, setRerender] = useState(false);
-
-    const updateActiveLayer = () => {setActiveLayer(mainCanvas.currentLayerIndex)}
 
     //When adding and removing nodes, array in mainCanvas changes.
     //I force rerender to synchronize this layer nodes with canvas array
@@ -25,11 +21,9 @@ function LayersSection(){
             <LayerNode
                 key={index}
 
-                active={index === activeLayer}
+                active={index === mainCanvas.currentLayerIndex}
 
                 layerIndex={index}
-
-                updateActiveLayer={updateActiveLayer}
                 
                 hideLayer={() => {mainCanvas.hideLayer(index)}}
                 showLayer={() => {mainCanvas.showLayer(index)}}

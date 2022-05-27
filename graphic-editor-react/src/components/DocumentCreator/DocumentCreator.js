@@ -1,21 +1,28 @@
 import "../../styles/DocumentCreator.css"
+import Canvas from "../Canvas/Canvas";
 
 function DocumentCreator(props){
-    var width = props.canvasResolution.x;
-    var height = props.canvasResolution.y;
+    const {
+        wrapperID,
+        setMainCanvas,
+        hideCreator,
+        setCurrentTool
+    } = props;
+
+    var width = 512;
+    var height = 512;
 
     const changeWidth = e => width = e.target.value;
     const changeHeight = e => height = e.target.value;
 
-    const cancel = () => {
-        props.hideCreator();
-    }
-
     const create = () => {
-        props.setCanvasResolution({x: parseInt(width), y: parseInt(height)})
+        setCurrentTool(null);
+        const canvas = new Canvas(wrapperID, width, height);
+
+        //TODO Maybe use normal variable instead of state?
+        setMainCanvas(canvas);
         
-        props.showCanvas();
-        props.hideCreator();
+        hideCreator();
     }
 
     return(
@@ -28,7 +35,7 @@ function DocumentCreator(props){
             <br/>
             <br/>
 
-            <button type="button" className="button_item" onClick={cancel}>Cancel</button>
+            <button type="button" className="button_item" onClick={hideCreator}>Cancel</button>
             <button type="button" className="button_item" onClick={create}>Create</button>
         </form>
     );

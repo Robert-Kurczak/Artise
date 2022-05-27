@@ -42,9 +42,9 @@ body{
 }
 
 .number_input::-webkit-outer-spin-button,
-.number_input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.number_input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .button_item{
@@ -56,4 +56,14 @@ body{
 
 .button_item:hover{
     background-color: #141414;
+}
+
+#canvas_wrapper{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-image: url("../Images/alpha_pattern.png");
+    background-size: 16px;
 }

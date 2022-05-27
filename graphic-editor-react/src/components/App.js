@@ -8,7 +8,6 @@ import DefaultScreen from "./DefaultScreen/DefaultScreen";
 import ToolsPanel from "./ToolsPanel/ToolsPanel"
 import DocumentCreator from "./DocumentCreator/DocumentCreator";
 import DocumentEditor from "./DocumentCreator/DocumentEditor";
-import DocumentCanvas from "./DocumentCanvas/DocumentCanvas";
 
 import { useState, createContext } from "react";
 import SettingsPanel from "./SettingsPanel/SettingsPanel";
@@ -22,9 +21,9 @@ function App(){
     //------
 
     //---Canvas---
-    const [showMainCanvas, setShowMainCanvas] = useState(false);
+    const wrapperID = "canvas_wrapper";
+
     const [mainCanvas, setMainCanvas] = useState(null);
-    const [canvasResolution, setCanvasResolution] = useState({x: 512, y: 512})
     const [canvObjToLoad, setCanvObjToLoad] = useState(null);
     //------
 
@@ -40,8 +39,7 @@ function App(){
     const hooksForTabs = {
         setShowDocumentCreator,
         setShowDocumentEditor,
-        setCanvObjToLoad,
-        setShowMainCanvas
+        setCanvObjToLoad
     };
 
     const GlobalContextContent = {
@@ -78,13 +76,11 @@ function App(){
             
             {showDocumentCreator &&
                 <DocumentCreator
+                    wrapperID={wrapperID}
                     setMainCanvas={setMainCanvas}
-
-                    canvasResolution={canvasResolution}
-                    setCanvasResolution={setCanvasResolution}
+                    setCurrentTool={setCurrentTool}
                     
                     hideCreator={() => {setShowDocumentCreator(false)}}
-                    showCanvas={() => {setShowMainCanvas(true)}}
                 />
             }
 
@@ -94,12 +90,8 @@ function App(){
                 />
             }
 
-            {showMainCanvas &&
-                <DocumentCanvas
-                    setMainCanvas={setMainCanvas}
-                    canvasResolution={canvasResolution}
-                />
-            }
+            {/* Wrapper for future canvases */}
+            <div id={wrapperID}></div>
 
         </GlobalContext.Provider>
     );

@@ -1,11 +1,11 @@
 import "../../../styles/AddLayerBtn.css"
 
 function AddLayerBtn(props){
-    const { updateLayersAmount, addLayer } = props;
+    const { rerenderNodes, addLayer } = props;
 
     const addNewLayer = () => {
         addLayer();
-        updateLayersAmount();
+        rerenderNodes();
     }
 
     return(

@@ -15,7 +15,7 @@ function LayerNode(props){
         changeLayer,
 
         removeLayer,
-        updateLayersAmount
+        rerenderNodes
     } = props;
 
     const changeLayerToThis = () => {
@@ -42,7 +42,7 @@ function LayerNode(props){
 
                 updateActiveLayer={updateActiveLayer}
                 removeLayer={removeLayer}
-                updateLayersAmount={updateLayersAmount}
+                rerenderNodes={rerenderNodes}
             />
 
         </div>

@@ -1,7 +1,7 @@
 import "../../../../styles/RemoveLayerBtn.css"
 
 function RemoveLayerBtn(props){
-    const { updateActiveLayer, removeLayer, updateLayersAmount } = props;
+    const { updateActiveLayer, removeLayer, rerenderNodes } = props;
     
     const removeThisLayer = (event) => {
         event.stopPropagation();
@@ -9,7 +9,7 @@ function RemoveLayerBtn(props){
         removeLayer();
 
         updateActiveLayer();
-        updateLayersAmount();
+        rerenderNodes();
     }
 
     return(

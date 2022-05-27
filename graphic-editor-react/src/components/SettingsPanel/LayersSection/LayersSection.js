@@ -10,14 +10,17 @@ function LayersSection(){
     const { mainCanvas } = useContext(GlobalContext);
 
     const [activeLayer, setActiveLayer] = useState(mainCanvas.currentLayerIndex);
-    const [layersAmount, setLayersAmount] = useState(mainCanvas.layers.length);
+    const [rerender, setRerender] = useState(false);
 
-    const updateLayersAmount = () => {setLayersAmount(mainCanvas.layers.length)}
     const updateActiveLayer = () => {setActiveLayer(mainCanvas.currentLayerIndex)}
+
+    //When adding and removing nodes, array in mainCanvas changes.
+    //I force rerender to synchronize this layer nodes with canvas array
+    const rerenderNodes = () => {setRerender(!rerender)}
 
     const nodes = [];
 
-    for(let index = 0; index < layersAmount; index++){
+    for(let index = 0; index < mainCanvas.layers.length; index++){
         nodes.push(
             <LayerNode
                 key={index}
@@ -33,7 +36,7 @@ function LayersSection(){
                 
                 changeLayer={() => {mainCanvas.changeLayer(index)}}
 
-                updateLayersAmount={updateLayersAmount}
+                rerenderNodes={rerenderNodes}
                 removeLayer={() => {mainCanvas.removeLayer(index)}}
             />
         )
@@ -46,7 +49,7 @@ function LayersSection(){
             </div>
 
             <AddLayerBtn
-                updateLayersAmount={updateLayersAmount}
+                rerenderNodes={rerenderNodes}
                 addLayer={() => {mainCanvas.addLayer()}}
             />
         </div>

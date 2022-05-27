@@ -74,6 +74,20 @@ class Canvas{
         this.canvasWrapper.style.height = `${this.canvasResolution.y / this.#scaleDivisor}px`;
     }
 
+    #createAuxilaryCanvas(width, height){
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style = "position: absolute; pointer-events: none; width: 100%; z-index: 10";
+        canvas.setAttribute("id", "auxilary-canvas");
+        const ctx = canvas.getContext("2d");
+
+        this.canvasWrapper.appendChild(canvas);
+
+        this.#auxilaryCanvas = canvas;
+        this.#auxilaryCanvasCTX = ctx;
+    }
+
     constructor(wrapperID, width, height){
         this.canvasResolution = {x: width, y: height};
 
@@ -83,14 +97,7 @@ class Canvas{
         //------
 
         //---Creating auxilary canvas---
-        this.#auxilaryCanvas = document.createElement("canvas");
-        this.#auxilaryCanvas.width = this.canvasResolution.x;
-        this.#auxilaryCanvas.height = this.canvasResolution.y;
-        this.#auxilaryCanvas.style = "position: absolute; pointer-events: none; width: 100%; z-index: 10";
-        this.#auxilaryCanvas.setAttribute("id", "auxilary-canvas");
-        this.#auxilaryCanvasCTX = this.#auxilaryCanvas.getContext("2d");
-
-        this.canvasWrapper.appendChild(this.#auxilaryCanvas);
+        this.#createAuxilaryCanvas(width, height);
         //------
 
         //---Creating main layer---
@@ -131,6 +138,59 @@ class Canvas{
         this.setFontSize(10);
         this.setFontFamily("Arial");
         //------
+    }
+
+    getCanvasJSON(){
+        const canvasesData = [];
+
+        for(let layer of this.layers){
+            canvasesData.push(layer.canvasNode.toDataURL());
+        }
+
+        return JSON.stringify({
+            resolution: this.canvasResolution,
+            layers: canvasesData
+        });
+    }
+
+    loadCanvasJSON(json){
+        const jsonObject = JSON.parse(json);
+
+        this.canvasResolution = jsonObject.resolution;
+        
+        this.#auxilaryCanvas.remove();
+        this.#createAuxilaryCanvas(this.canvasResolution.x, this.canvasResolution.y);
+
+        //---Recreating layers---
+        const canvasData = jsonObject.layers;
+
+        for(let i = 0; i < this.layers.length; i++){
+            this.layers[0].canvasNode.remove();
+            this.layers.splice(0, 1);
+        }
+
+        this.currentLayerIndex = 0
+
+        for(let i = 0; i < canvasData.length; i++){
+            this.addLayer();
+
+            const image = new Image();
+            image.onload = () => {
+                this.layers[i].canvasCTX.clearRect(0, 0, this.canvasResolution.x, this.canvasResolution.y);
+                this.layers[i].canvasCTX.drawImage(image, 0, 0);
+            }
+
+            image.src = canvasData[i];
+        }
+        //------
+
+        this.currentLayerIndex = 0;
+        const currentLayer = this.layers[this.currentLayerIndex];
+        currentLayer.canvasNode.style.pointerEvents = "auto";
+
+        this.setScale();
+
+        this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
     }
 
     addLayer(){
@@ -188,7 +248,7 @@ class Canvas{
     removeLayer(layerIndex){
         this.layers[layerIndex].canvasNode.remove();
 
-        if(layerIndex === this.currentLayerIndex){
+        if(layerIndex === this.currentLayerIndex && this.layers.length > 1){
             const newIndex = layerIndex - 1 >= 0 ? layerIndex - 1 : layerIndex + 1
             
             this.changeLayer(newIndex);
@@ -292,11 +352,14 @@ class Canvas{
         return this.layers[this.currentLayerIndex].canvasCTX.lineWidth;
     }
 
-    drawMode(mode, compositeOperation="source-over"){
+    setDrawOperation(operation){
+        this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = operation;
+    }
+
+    drawMode(mode){
         var lastPosition;
         
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "round";
-        this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = compositeOperation;
 
         const brushDraw = (event) => {
             this.layers[this.currentLayerIndex].canvasCTX.beginPath();
@@ -329,7 +392,7 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", brushDraw);
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawingMethod);
         }
 
         const handleMouseUp = () => {
@@ -585,10 +648,8 @@ class Canvas{
             this.canvasWrapper.addEventListener("mousedown", () => {
                 const metrics = this.layers[this.currentLayerIndex].canvasCTX.measureText(this.#textInputHolder.value);
 
-                console.log(metrics);
-
                 const x = clickedPosition.x;
-                const y = clickedPosition.y + metrics.actualBoundingBoxAscent * this.#scaleDivisor;
+                const y = clickedPosition.y + metrics.actualBoundingBoxAscent + 6 * this.#scaleDivisor;
 
                 this.layers[this.currentLayerIndex].canvasCTX.fillText(this.#textInputHolder.value, x, y);
                 this.#textInputHolder.value = "";

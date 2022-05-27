@@ -25,7 +25,7 @@ function LayerNode(props){
         updateActiveLayer();
     }
 
-    const style = active? {backgroundColor: "#141414"} : null;
+    const style = active ? {backgroundColor: "#141414"} : null;
 
     return(
         <div className="layer_node" onClick={changeLayerToThis} style={style}>

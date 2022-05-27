@@ -1,6 +1,7 @@
 import Tab from "./Tab";
 
 import openFile from "./openFile";
+import saveFile from "./saveFile";
 
 import { GlobalContext } from "../../App";
 import { useContext } from "react";
@@ -14,7 +15,7 @@ function TabsStructure(props){
     const {
         setShowDocumentCreator,
         setShowDocumentEditor,
-        setCanvasImage,
+        setCanvObjToLoad,
         setShowMainCanvas
     } = props.hooks
 
@@ -33,7 +34,7 @@ function TabsStructure(props){
                         },
                         {
                             name: "Save JSON",
-                            onClick: () => {/*Toggle component*/}
+                            onClick: () => {saveFile(mainCanvas.getCanvasJSON())}
                         }
                     ],
                 },
@@ -42,7 +43,7 @@ function TabsStructure(props){
                     onClick: () => {
                         openFile(
                             mainCanvas,
-                            setCanvasImage,
+                            setCanvObjToLoad,
                             setShowMainCanvas
                         )
                     }
@@ -61,8 +62,8 @@ function TabsStructure(props){
     ];
 
     //Render tabs structure from structure array
-    const items = structure.map(itemObj => 
-        <Tab rootTab={true} key={itemObj.name + "_tab"} content={itemObj} />
+    const items = structure.map((itemObj, index) => 
+        <Tab rootTab={true} key={index} content={itemObj} />
     );
 
     return(

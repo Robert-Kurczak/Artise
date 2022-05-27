@@ -25,7 +25,7 @@ function App(){
     const [showMainCanvas, setShowMainCanvas] = useState(false);
     const [mainCanvas, setMainCanvas] = useState(null);
     const [canvasResolution, setCanvasResolution] = useState({x: 512, y: 512})
-    const [canvasImage, setCanvasImage] = useState(null);
+    const [canvObjToLoad, setCanvObjToLoad] = useState(null);
     //------
 
     //---Color picker---
@@ -40,7 +40,7 @@ function App(){
     const hooksForTabs = {
         setShowDocumentCreator,
         setShowDocumentEditor,
-        setCanvasImage,
+        setCanvObjToLoad,
         setShowMainCanvas
     };
 
@@ -92,7 +92,6 @@ function App(){
                 <DocumentEditor
                     hideCreator={() => {setShowDocumentEditor(false)}}
                 />
-                
             }
 
             {showMainCanvas &&

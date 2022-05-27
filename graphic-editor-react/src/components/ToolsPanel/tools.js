@@ -3,10 +3,26 @@ import { GlobalContext } from "../App"
 
 import Icon from "./Icon";
 
+import {
+	mdiBrush,
+	mdiPencil,
+	mdiEraser,
+	mdiEyedropper,
+	mdiFormatColorFill,
+	mdiGradientHorizontal,
+	mdiCursorMove,
+	mdiSelectDrag,
+	mdiMinus,
+	mdiRectangleOutline,
+	mdiCircleOutline,
+	mdiFormatTitle
+
+} from '@mdi/js'; 
+
 class Tool{
-	constructor(toolName, iconName, enableFunction, disableFunction){
+	constructor(toolName, icon, enableFunction, disableFunction){
 		this.toolName = toolName;
-		this.iconName = iconName;
+		this.icon = icon;
 
 		this.enable = () => {
 			enableFunction()
@@ -44,7 +60,7 @@ function Tools() {
 	/* #region  Brush */
 	const brushTool = new Tool(
 		"brush",
-		"brush",
+		mdiBrush,
 		//Enable
 		() => {
 			mainCanvas.drawMode("brush");
@@ -59,7 +75,7 @@ function Tools() {
 	/* #region  Pencil */
 	const pencilTool = new Tool(
 		"pencil",
-		"edit",
+		mdiPencil,
 		//Enable
 		() => {
 			mainCanvas.drawMode("pencil");
@@ -74,13 +90,15 @@ function Tools() {
 	/* #region  Eraser */
 	const eraserTool = new Tool(
 		"eraser",
-		"clear",
+		mdiEraser,
 		//Enable
 		() => {
-			mainCanvas.drawMode("brush", "destination-out")
+			mainCanvas.setDrawOperation("destination-out");
+			mainCanvas.drawMode("brush");
 		},
 		//Disable
 		() => {
+			mainCanvas.setDrawOperation("source-over");
 			mainCanvas.clearMode();
 		}
 	);
@@ -93,7 +111,7 @@ function Tools() {
 
 	const eyedropperTool = new Tool(
 		"eyedropper",
-		"colorize",
+		mdiEyedropper,
 		//Enable
 		() => {
 			mainCanvas.eyedropperMode(true);
@@ -110,7 +128,7 @@ function Tools() {
 	/* #region  Fill */
 	const fillTool = new Tool(
 		"fill",
-		"format_color_fill",
+		mdiFormatColorFill,
 		//Enable
 		() => {
 			mainCanvas.bucketFillMode();
@@ -125,7 +143,7 @@ function Tools() {
 	/* #region  Gradient */
 	const gradientTool = new Tool(
 		"gradient",
-		"gradient",
+		mdiGradientHorizontal,
 		() => {
 			//On
 		},
@@ -138,7 +156,7 @@ function Tools() {
 	/* #region  Move */
 	const moveTool = new Tool(
 		"move",
-		"pinch",
+		mdiCursorMove,
 		() => {
 			mainCanvas.clearMode();
 		},
@@ -151,7 +169,7 @@ function Tools() {
 	/* #region  Select */
 	const selectTool = new Tool(
 		"select",
-		"highlight_alt",
+		mdiSelectDrag,
 		() => {
 			//On
 		},
@@ -164,7 +182,7 @@ function Tools() {
 	/* #region  Line */
 	const lineTool = new Tool(
 		"line",
-		"horizontal_rule",
+		mdiMinus,
 		//Enable
 		() => {
 			mainCanvas.drawLineMode();
@@ -179,7 +197,7 @@ function Tools() {
 	/* #region  Rectangle */
 	const rectangleTool = new Tool(
 		"rectangle",
-		"rectangle",
+		mdiRectangleOutline,
 		//Enable
 		() => {
 			mainCanvas.drawRectMode();
@@ -194,7 +212,7 @@ function Tools() {
 	/* #region Circle */
 	const circleTool = new Tool(
 		"circle",
-		"circle",
+		mdiCircleOutline,
 		//Enable
 		() => {
 			mainCanvas.drawCircleMode();
@@ -209,7 +227,7 @@ function Tools() {
 	/* #region  Text */
 	const textTool = new Tool(
 		"text",
-		"title",
+		mdiFormatTitle,
 		//Enable
 		() => {
 			mainCanvas.textMode();
@@ -237,7 +255,15 @@ function Tools() {
 	];
 
 	const icons = tools.map((toolObj, index) =>
-		<Icon key={index} toolName={toolObj.toolName} iconName={toolObj.iconName} onClick={() => {switchTool(toolObj)}}/>
+		<Icon
+			key={index}
+
+			toolName={toolObj.toolName}
+			icon={toolObj.icon}
+			onClick={() => {switchTool(toolObj)}}
+
+			active={currentTool ? toolObj.toolName === currentTool.toolName : false}
+		/>
 	);
 
 	return icons;

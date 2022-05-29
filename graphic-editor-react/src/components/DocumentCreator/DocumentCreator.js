@@ -1,12 +1,9 @@
 import "../../styles/DocumentCreator.css"
-import Canvas from "../Canvas/Canvas";
 
 function DocumentCreator(props){
     const {
-        wrapperID,
-        setMainCanvas,
-        hideCreator,
-        setCurrentTool
+        createCanvas,
+        hideCreator
     } = props;
 
     var width = 512;
@@ -16,12 +13,7 @@ function DocumentCreator(props){
     const changeHeight = e => height = e.target.value;
 
     const create = () => {
-        setCurrentTool(null);
-        const canvas = new Canvas(wrapperID, width, height);
-
-        //TODO Maybe use normal variable instead of state?
-        setMainCanvas(canvas);
-        
+        createCanvas(width, height);
         hideCreator();
     }
 

@@ -1,23 +1,17 @@
 import Tab from "./Tab";
 
-import openFile from "./openFile";
-import saveFile from "./saveFile";
-
-import { GlobalContext } from "../../App";
-import { useContext } from "react";
-
-
 //Automatically generates tab structure from tabsStructure.js
 //Then adds any other objects that were declared between <UpperPanel></UpperPanel>
 function TabsStructure(props){
-    const { mainCanvas } = useContext(GlobalContext);
-
     const {
         setShowDocumentCreator,
         setShowDocumentEditor,
-        setCanvObjToLoad,
-        setShowMainCanvas
-    } = props.hooks
+
+        opener,
+        downloadJSON,
+        saveLocal,
+        downloadImage
+    } = props
 
     const structure = [
         {name: "File",
@@ -30,23 +24,27 @@ function TabsStructure(props){
                     menu: [
                         {
                             name: "Save to browser",
-                            onClick: () => {/*Toggle component*/}
+                            onClick: () => {saveLocal()}
                         },
                         {
                             name: "Save JSON",
-                            onClick: () => {saveFile(mainCanvas.getCanvasJSON())}
+                            onClick: () => {downloadJSON()}
                         }
                     ],
                 },
                 {
                     name: "Open",
                     onClick: () => {
-                        openFile(
-                            mainCanvas,
-                            setCanvObjToLoad,
-                            setShowMainCanvas
-                        )
+                        opener.open();
                     }
+                },
+                {name: "Export",
+                    menu: [
+                        {
+                            name: "Save PNG",
+                            onClick: () => {downloadImage()}
+                        }
+                    ]
                 }
             ]
         },

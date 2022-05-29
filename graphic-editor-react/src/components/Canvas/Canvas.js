@@ -1,3 +1,9 @@
+class layer{
+    constructor(){
+
+    }
+}
+
 class Canvas{
     //Max dimensions of canvas on screen (not canvas resolution)
     #MAX_WIDTH = 1024;
@@ -88,13 +94,32 @@ class Canvas{
         this.#auxilaryCanvasCTX = ctx;
     }
 
-    constructor(wrapperID, width, height){
-        this.canvasResolution = {x: width, y: height};
-
+    //---Construct section---
+    constructor(wrapperID){
         //---Setting wrapper---
         this.canvasWrapper = document.getElementById(wrapperID);
         this.canvasWrapper.innerHTML = "";
         //------
+
+        //---Initialize input holder---
+        this.#textInputHolder = document.createElement("textarea");
+        this.#textInputHolder.style = `
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0);
+            border: 2px solid #141414;
+            padding: 0px;
+        `;
+        //------
+
+        //When the window resizes, previous bounding rect is invalid.
+        //It have to be recalculated again
+        window.addEventListener("resize", () => {
+            this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
+        });
+    }
+
+    initNew(width, height){
+        this.canvasResolution = {x: width, y: height};
 
         //---Creating auxilary canvas---
         this.#createAuxilaryCanvas(width, height);
@@ -117,59 +142,17 @@ class Canvas{
         
         //Get wrapper position on screen
         this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
-
-        //Initialize input holder
-        this.#textInputHolder = document.createElement("textarea");
-        this.#textInputHolder.style = `
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0);
-            border: 2px solid #141414;
-            padding: 0px;
-        `;
-
-        //When the window resizes, previous bounding rect is invalid.
-        //It have to be recalculated again
-        window.addEventListener("resize", () => {
-            this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
-        });
-
-        //---Some initial values---
-        this.setDrawWidth(5);
-        this.setFontSize(10);
-        this.setFontFamily("Arial");
-        //------
     }
 
-    getCanvasJSON(){
-        const canvasesData = [];
+    initFromJSON(jsonObject){
+        const resolution = jsonObject.resolution;
+        this.initNew(resolution.x, resolution.y);
 
-        for(let layer of this.layers){
-            canvasesData.push(layer.canvasNode.toDataURL());
-        }
-
-        return JSON.stringify({
-            resolution: this.canvasResolution,
-            layers: canvasesData
-        });
-    }
-
-    loadCanvasJSON(json){
-        const jsonObject = JSON.parse(json);
-
-        this.canvasResolution = jsonObject.resolution;
+        this.layers[0].canvasNode.remove();
+        this.layers = [];
         
-        this.#auxilaryCanvas.remove();
-        this.#createAuxilaryCanvas(this.canvasResolution.x, this.canvasResolution.y);
-
         //---Recreating layers---
         const canvasData = jsonObject.layers;
-
-        for(let i = 0; i < this.layers.length; i++){
-            this.layers[0].canvasNode.remove();
-            this.layers.splice(0, 1);
-        }
-
-        this.currentLayerIndex = 0
 
         for(let i = 0; i < canvasData.length; i++){
             this.addLayer();
@@ -184,13 +167,21 @@ class Canvas{
         }
         //------
 
-        this.currentLayerIndex = 0;
-        const currentLayer = this.layers[this.currentLayerIndex];
-        currentLayer.canvasNode.style.pointerEvents = "auto";
+        this.layers[0].canvasNode.style.pointerEvents = "auto";
+    }
+    //------
 
-        this.setScale();
+    getCanvasJSON(){
+        const canvasesData = [];
 
-        this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
+        for(let layer of this.layers){
+            canvasesData.push(layer.canvasNode.toDataURL());
+        }
+
+        return JSON.stringify({
+            resolution: this.canvasResolution,
+            layers: canvasesData
+        });
     }
 
     addLayer(){
@@ -246,6 +237,8 @@ class Canvas{
     }
 
     removeLayer(layerIndex){
+        if(this.layers.length === 1) return;
+
         this.layers[layerIndex].canvasNode.remove();
 
         if(layerIndex === this.currentLayerIndex && this.layers.length > 1){
@@ -354,6 +347,10 @@ class Canvas{
 
     setDrawOperation(operation){
         this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = operation;
+    }
+
+    addImage(image){
+        this.layers[this.currentLayerIndex].canvasCTX.drawImage(image, 0, 0);
     }
 
     drawMode(mode){

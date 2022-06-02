@@ -1,5 +1,5 @@
 {
-  "name": "graphic-editor-react",
+  "name": "artific",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -37,5 +37,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Robert-Kurczak/Artific.git"
+  },
+  "author": "Robert Kurczak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Robert-Kurczak/Artific/issues"
+  },
+  "homepage": "https://github.com/Robert-Kurczak/Artific#readme",
+  "description": ""
 }

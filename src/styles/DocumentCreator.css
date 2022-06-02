@@ -1,0 +1,21 @@
+.document_creator{
+    width: 30%;
+    height: auto;
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding-top: 1%;
+    z-index: 2;
+}
+
+.document_creator p{
+    display: inline-block;
+    margin-right: 2%;
+}
+
+.document_creator button{
+    width: 50%;
+    height: 30px;
+}

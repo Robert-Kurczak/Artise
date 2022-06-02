@@ -1,0 +1,7 @@
+.tools_panel{
+    display: inline-block;
+    padding: 5px;
+    position: absolute;
+    top: 25%;
+    overflow: initial;
+}

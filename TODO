@@ -1,26 +1,5 @@
-1. Tworzenie obszaru roboczego
-        *Ładowanie obrazu z pliku
-        *Tworzenie nowego arkusza
-        *Zmiana rozmiaru arkusza
+draggable layers nodes
+better pencil
+pass mainCanvas instead of context
 
-2. Narzędzia:
-    *Kształty takie jak linie, prostokąty
-        *Dostosowanie ich grubości
-    *Kubek z farbą
-    *Pędzel
-    *Probówka koloru
-    *Tekst
-
-Paleta kolorów:
-    *RGB
-    *HSV
-
-Obsługa warstw
-
-
-
-Technologie
-
-Potencjalnie: Fabric.js, React.js, jQuery
-
-http://fabricjs.com/fabric-intro-part-1
+tools and document creators rerender whole app

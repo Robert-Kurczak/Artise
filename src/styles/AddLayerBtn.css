@@ -1,0 +1,10 @@
+.layer_add_btn{
+    text-align: center;
+    user-select: none;
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+.layer_add_btn:hover{
+    background-color: #141414;
+}

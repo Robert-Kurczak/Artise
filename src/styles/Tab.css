@@ -1,0 +1,19 @@
+.root_tab_wrapper{
+    display: inline-block;
+}
+
+.nested_tab_wrapper{
+    overflow: inherit;
+    position: relative;
+}
+
+.tab{
+    position: absolute;
+    z-index: 2;
+    overflow: initial;
+}
+
+.nested_tab{
+    left: 100%;
+    top: 0px;
+}

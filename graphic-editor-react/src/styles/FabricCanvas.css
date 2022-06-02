@@ -1,9 +1,0 @@
-.canvas-container{
-    position: absolute !important;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    background-image: url("../Images/alpha_pattern.png");
-    background-size: 16px;
-}

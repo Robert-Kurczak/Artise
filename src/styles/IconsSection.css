@@ -1,0 +1,18 @@
+.tools_grid{
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    grid-auto-rows: 40px;
+}
+
+.tools_grid span{
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+.tools_grid span:hover{
+    background-color: #141414;
+}
+
+.tools_grid span svg{
+    padding: 20%;
+}

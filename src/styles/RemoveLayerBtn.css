@@ -1,0 +1,10 @@
+.layer_remove{
+    cursor: pointer;
+    transition-duration: 0.3s;
+    user-select: none;
+    padding: 5px;
+}
+
+.layer_remove:hover{
+    background-color: #141414;
+}

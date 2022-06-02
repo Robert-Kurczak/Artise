@@ -1,0 +1,69 @@
+@font-face {
+    font-family: "Share Tech Mono";
+    src: url(../Fonts/ShareTechMono-Regular.ttf) format("truetype");
+}
+
+*{
+    font-family: "Share Tech Mono", monospace;
+    color: #E2EBFA;
+}
+
+body{
+    background-color: #141414;
+    overflow: hidden;
+    margin: 0;
+}
+
+.panel{
+    background-color: #212121;
+    box-shadow: 0px 0px 15px 2px black;
+    overflow: hidden;
+}
+
+.section_stripe{
+    height: 2px;
+    width: 75%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: table;
+    margin: auto;
+}
+
+.number_input{
+    background-color: #141414;
+    color: white;
+    border: none;
+    text-align: center;
+    width: 15%;
+    height: 25px;
+    font-style: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 100%;
+    -moz-appearance: textfield;
+}
+
+.number_input::-webkit-outer-spin-button,
+.number_input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.button_item{
+    background-color: #212121;
+    border: none;
+    cursor: pointer;
+    transition-duration: 0.3s;
+}
+
+.button_item:hover{
+    background-color: #141414;
+}
+
+#canvas_wrapper{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-image: url("../Images/alpha_pattern.png");
+    background-size: 16px;
+}

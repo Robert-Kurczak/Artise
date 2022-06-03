@@ -93,12 +93,10 @@ function Tools() {
 		mdiEraser,
 		//Enable
 		() => {
-			mainCanvas.setDrawOperation("destination-out");
-			mainCanvas.drawMode("brush");
+			mainCanvas.eraserMode();
 		},
 		//Disable
 		() => {
-			mainCanvas.setDrawOperation("source-over");
 			mainCanvas.clearMode();
 		}
 	);
@@ -170,11 +168,13 @@ function Tools() {
 	const selectTool = new Tool(
 		"select",
 		mdiSelectDrag,
+		//Enable
 		() => {
-			//On
+			mainCanvas.selectMode();
 		},
+		//Disable
 		() => {
-			//Off
+			mainCanvas.clearMode();
 		}
 	);
 	/* #endregion */

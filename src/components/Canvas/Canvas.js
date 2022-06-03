@@ -17,78 +17,20 @@ class Canvas{
 
     //Holder for inputing text before actualy drawing it on canvas
     #textInputHolder;
-    
-    //For storing references to events function so they can be delete later
-    #eventFunctions = {
-        mousedown: null,
-        mouseup: null,
-        click: null
-    };
-    
+
+    //Array that stores functions for cleaning up modes side effects
+    //Some modes can use other modes therefore it have to be an array instead of function
+    //clearMode() executes each function and clear this array
+    #modeCleanups = [];
+        
     canvasWrapper;
 
     //Index of currently selected layer
     currentLayerIndex;
     
-    canvasDimensions = {x: 0, y: 0};
     canvasResolution = {x: 0, y: 0};
     
     layers = [];
-
-    //Extract clicked, relative to canvas, position from event
-    #extractPosition(event){
-        const currentPosition = {
-            x: Math.floor((event.clientX - this.#canvasBoundingRect.left) * this.#scaleDivisor),
-            y: Math.floor((event.clientY - this.#canvasBoundingRect.top) * this.#scaleDivisor)
-        };
-
-        return currentPosition;
-    }
-
-    #getPixel(imageData, x, y){
-        if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) return [-1, -1, -1, -1];
-
-        const startIndex = (y * imageData.width + x) * 4
-
-        return imageData.data.slice(startIndex, startIndex + 4);
-    }
-
-    #setPixel(imageData, x, y, value){
-        const startIndex = (y * imageData.width + x) * 4
-
-        imageData.data[startIndex + 0] = value[0];
-        imageData.data[startIndex + 1] = value[1];
-        imageData.data[startIndex + 2] = value[2];
-        imageData.data[startIndex + 3] = value[3];
-    }
-
-    //Compute scale divisor so the canvas can properly fit on screen
-    //while maintaining it's resolution
-    setScale(){
-        if(this.canvasResolution.x > this.#MAX_WIDTH && this.canvasResolution.x < this.canvasResolution.y){
-            this.#scaleDivisor = this.canvasResolution.x / this.#MAX_WIDTH;
-        }
-        else if(this.canvasResolution.y > this.#MAX_HEIGHT){
-            this.#scaleDivisor = this.canvasResolution.y / this.#MAX_HEIGHT;
-        }
-
-        this.canvasWrapper.style.width = `${this.canvasResolution.x / this.#scaleDivisor}px`;
-        this.canvasWrapper.style.height = `${this.canvasResolution.y / this.#scaleDivisor}px`;
-    }
-
-    #createAuxilaryCanvas(width, height){
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        canvas.style = "position: absolute; pointer-events: none; width: 100%; z-index: 10";
-        canvas.setAttribute("id", "auxilary-canvas");
-        const ctx = canvas.getContext("2d");
-
-        this.canvasWrapper.appendChild(canvas);
-
-        this.#auxilaryCanvas = canvas;
-        this.#auxilaryCanvasCTX = ctx;
-    }
 
     //---Construct section---
     constructor(wrapperID){
@@ -167,6 +109,52 @@ class Canvas{
     }
     //------
 
+    //---Private methods---
+    #createAuxilaryCanvas(width, height){
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style = "position: absolute; pointer-events: none; width: 100%; z-index: 10";
+        canvas.setAttribute("id", "auxilary-canvas");
+        const ctx = canvas.getContext("2d");
+
+        this.canvasWrapper.appendChild(canvas);
+
+        this.#auxilaryCanvas = canvas;
+        this.#auxilaryCanvasCTX = ctx;
+    }
+
+    //Extract clicked, relative to canvas, position from event
+    #extractPosition(event){
+        const currentPosition = {
+            x: Math.floor((event.clientX - this.#canvasBoundingRect.left) * this.#scaleDivisor),
+            y: Math.floor((event.clientY - this.#canvasBoundingRect.top) * this.#scaleDivisor)
+        };
+
+        return currentPosition;
+    }
+
+    #getPixel(imageData, x, y){
+        if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) return [-1, -1, -1, -1];
+
+        const startIndex = (y * imageData.width + x) * 4
+
+        return imageData.data.slice(startIndex, startIndex + 4);
+    }
+
+    #setPixel(imageData, x, y, value){
+        const startIndex = (y * imageData.width + x) * 4
+
+        imageData.data[startIndex + 0] = value[0];
+        imageData.data[startIndex + 1] = value[1];
+        imageData.data[startIndex + 2] = value[2];
+        imageData.data[startIndex + 3] = value[3];
+    }
+
+    #moveSettings(){}
+    //------
+
+    //---Public getters---
     getCanvasJSON(){
         const canvasesData = [];
 
@@ -180,87 +168,11 @@ class Canvas{
         });
     }
 
-    addLayer(){
-        const layer = new Layer(this.canvasResolution.x, this.canvasResolution.y);
-        this.layers.push(layer);
-        this.canvasWrapper.appendChild(layer.canvasNode);
-    }
-
-    #moveSettings(prevLayer, newLayer){
-        newLayer.canvasCTX.lineWidth = prevLayer.canvasCTX.lineWidth;
-        newLayer.canvasCTX.strokeStyle = prevLayer.canvasCTX.strokeStyle;
-        newLayer.canvasCTX.lineCap = prevLayer.canvasCTX.lineCap;
-        newLayer.canvasCTX.globalCompositeOperation = prevLayer.canvasCTX.globalCompositeOperation;
-        
-        newLayer.canvasCTX.font = prevLayer.canvasCTX.font;
-        newLayer.canvasCTX.fillColor = prevLayer.canvasCTX.fillColor;
-    }
-
-    //TODO make object for storing settings
-    changeLayer(layerIndex){
-        const prevLayer = this.layers[this.currentLayerIndex];
-        const currentLayer = this.layers[layerIndex];
-        this.currentLayerIndex = layerIndex;
-                
-        //---Moving settings and events from previous layer to current---
-        this.#moveSettings(prevLayer, currentLayer);
-        prevLayer.transferEvents(currentLayer);
-        //------
-        
-        //Moving layer to the back
-        prevLayer.canvasNode.style.pointerEvents = "none";
-        currentLayer.canvasNode.style.pointerEvents = "auto";
-    }
-
-    removeLayer(layerIndex){
-        if(this.layers.length === 1) return;
-
-        this.layers[layerIndex].canvasNode.remove();
-
-        if(layerIndex === this.currentLayerIndex && this.layers.length > 1){
-            const newIndex = layerIndex - 1 >= 0 ? layerIndex - 1 : layerIndex + 1
-            
-            this.changeLayer(newIndex);
-        }
-
-        //If layer under current active layer is being removed I have to decrement currentLayerIndex
-        if(layerIndex <= this.currentLayerIndex) this.currentLayerIndex--;
-
-        this.layers.splice(layerIndex, 1);
-    }
-
-    hideLayer(layerIndex){
-        this.layers[layerIndex].canvasNode.style.opacity = 0;
-    }
-
-    showLayer(layerIndex){
-        this.layers[layerIndex].canvasNode.style.opacity = 1;
-    }
-
-    //TODO better text color updating
-    setColor(color){
-        this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
-        this.#auxilaryCanvasCTX.strokeStyle = color;
-
-        //For text
-        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
-        this.#textInputHolder.style.color = color;
-    }
-
     getColor(){
         return this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
     }
 
-    setFontSize(size){
-        var scaledSize = Math.round(size * this.#scaleDivisor);
-        
-        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
-        currentCTX.font = currentCTX.font.replace(/\d+px/, `${scaledSize}px`);
-
-        this.#textInputHolder.style.fontSize = size + "px";
-    }
-
-    //read from input holder?
+    //TODO read from input holder?
     getFontSize(scaled=false){
         const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
         const pxIndex = currentFont.indexOf("px");
@@ -271,24 +183,10 @@ class Canvas{
         return size;
     }
 
-    setFontFamily(fontFamily){
-        //Setting CTX
-        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
-        currentCTX.font = currentCTX.font.replace(currentCTX.font.substr(currentCTX.font.indexOf("px") + 3), fontFamily);
-
-        //Setting holder style
-        this.#textInputHolder.style.fontFamily = fontFamily;
-
-    }
-
     getFontFamily(){
         const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
 
         return currentFont.substring(currentFont.indexOf("px") + 3);
-    }
-
-    setFillColor(color){
-        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
     }
 
     getFillColor(){
@@ -310,29 +208,156 @@ class Canvas{
         }
     }
 
-    setDrawWidth(size){
-        if(size > 0){
-            this.layers[this.currentLayerIndex].canvasCTX.lineWidth = size;
-            this.#auxilaryCanvasCTX.lineWidth = size;
-        }
-    }
-
     getDrawWidth(){
         return this.layers[this.currentLayerIndex].canvasCTX.lineWidth;
     }
 
-    setDrawOperation(operation){
-        this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = operation;
+    //Returns canvas combined from all layers
+    getMergedLayers(){
+        const resultCanvas = document.createElement("canvas");
+        resultCanvas.width = this.canvasResolution.x;
+        resultCanvas.height = this.canvasResolution.y;
+
+        const resultCanvasCTX = resultCanvas.getContext("2d");
+
+        for(let layer of this.layers){
+            resultCanvasCTX.drawImage(layer.canvasNode, 0, 0);
+        }
+
+        return resultCanvas;
     }
 
-    addImage(image){
-        this.layers[this.currentLayerIndex].canvasCTX.drawImage(image, 0, 0);
-    }
-
-    drawMode(mode){
-        var lastPosition;
+    //Returns canvas containing one pixel
+    getMergedPixel(x, y){
+        const resultCanvas = document.createElement("canvas");
+        resultCanvas.width = 1;
+        resultCanvas.height = 1;
         
+        const resultCanvasCTX = resultCanvas.getContext("2d");
+
+        for(let layer of this.layers){
+            resultCanvasCTX.drawImage(layer.canvasNode, x, y, 1, 1, 0, 0, 1, 1);
+        }
+
+        return resultCanvas;
+    }
+    //------
+
+    //---Public setters---
+    setColor(color){
+        this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
+        this.#auxilaryCanvasCTX.strokeStyle = color;
+
+        //For text
+        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
+        this.#textInputHolder.style.color = color;
+    }
+
+    //Compute scale divisor so the canvas can properly fit on screen
+    //while maintaining it's resolution
+    setScale(){
+        if(this.canvasResolution.x > this.#MAX_WIDTH && this.canvasResolution.x < this.canvasResolution.y){
+            this.#scaleDivisor = this.canvasResolution.x / this.#MAX_WIDTH;
+        }
+        else if(this.canvasResolution.y > this.#MAX_HEIGHT){
+            this.#scaleDivisor = this.canvasResolution.y / this.#MAX_HEIGHT;
+        }
+
+        this.canvasWrapper.style.width = `${this.canvasResolution.x / this.#scaleDivisor}px`;
+        this.canvasWrapper.style.height = `${this.canvasResolution.y / this.#scaleDivisor}px`;
+    }
+
+    setFontSize(size){
+        var scaledSize = Math.round(size * this.#scaleDivisor);
+        
+        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
+        currentCTX.font = currentCTX.font.replace(/\d+px/, `${scaledSize}px`);
+
+        this.#textInputHolder.style.fontSize = size + "px";
+    }
+
+    setFontFamily(fontFamily){
+        //Setting CTX
+        const currentCTX = this.layers[this.currentLayerIndex].canvasCTX;
+        currentCTX.font = currentCTX.font.replace(currentCTX.font.substr(currentCTX.font.indexOf("px") + 3), fontFamily);
+
+        //Setting holder style
+        this.#textInputHolder.style.fontFamily = fontFamily;
+    }
+
+    setFillColor(color){
+        this.layers[this.currentLayerIndex].canvasCTX.fillStyle = color;
+    }
+
+    setDrawWidth(size){
+        this.layers[this.currentLayerIndex].canvasCTX.lineWidth = size;
+        this.#auxilaryCanvasCTX.lineWidth = size;
+    }
+    //------
+
+    //---Layers methods---
+    addLayer(){
+        const layer = new Layer(this.canvasResolution.x, this.canvasResolution.y);
+        this.layers.push(layer);
+        this.canvasWrapper.appendChild(layer.canvasNode);
+    }
+
+    removeLayer(layerIndex){
+        if(this.layers.length === 1) return;
+
+        this.layers[layerIndex].canvasNode.remove();
+
+        if(layerIndex === this.currentLayerIndex && this.layers.length > 1){
+            const newIndex = layerIndex - 1 >= 0 ? layerIndex - 1 : layerIndex + 1
+            
+            this.changeLayer(newIndex);
+        }
+
+        //If layer under current active layer is being removed I have to decrement currentLayerIndex
+        if(layerIndex <= this.currentLayerIndex) this.currentLayerIndex--;
+
+        this.layers.splice(layerIndex, 1);
+    }
+
+    changeLayer(layerIndex){
+        const prevLayer = this.layers[this.currentLayerIndex];
+        const currentLayer = this.layers[layerIndex];
+        this.currentLayerIndex = layerIndex;
+                
+        //---Moving settings and events from previous layer to current---
+        this.#moveSettings(prevLayer, currentLayer);
+        prevLayer.transferEvents(currentLayer);
+        //------
+        
+        //Moving layer to the back
+        prevLayer.canvasNode.style.pointerEvents = "none";
+        currentLayer.canvasNode.style.pointerEvents = "auto";
+    }
+
+    hideLayer(layerIndex){
+        this.layers[layerIndex].canvasNode.style.opacity = 0;
+    }
+
+    showLayer(layerIndex){
+        this.layers[layerIndex].canvasNode.style.opacity = 1;
+    }
+    //------
+
+    //---Modes---
+    drawMode(mode){
+        //---Proper settings---
+        const prevSettings = {
+            lineCap: this.layers[this.currentLayerIndex].canvasCTX.lineCap
+        };
+
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "round";
+        //------
+
+        this.#modeCleanups.push(() => {
+            this.layers[this.currentLayerIndex].canvasCTX.lineCap = prevSettings.lineCap;
+        });
+
+        var lastPosition;
 
         const brushDraw = (event) => {
             this.layers[this.currentLayerIndex].canvasCTX.beginPath();
@@ -385,10 +410,38 @@ class Canvas{
         );
     }
 
+    eraserMode(){
+        //---Proper settings---
+        const prevSettings = {
+            globalCompositeOperation: this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation
+        };
+
+        this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = "destination-out";
+        //------
+
+        this.#modeCleanups.push(() => {
+            this.layers[this.currentLayerIndex].canvasCTX.globalCompositeOperation = prevSettings.globalCompositeOperation;
+        });
+
+        this.drawMode("brush");
+    }
+
     drawLineMode(){
-        var lastPosition;
+        //---Proper settings---
+        const prevSettings = {
+            lineCap: this.#auxilaryCanvasCTX.lineCap
+        };
 
         this.#auxilaryCanvasCTX.lineCap = "square";
+        this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
+        //------
+
+        this.#modeCleanups.push(() => {
+            this.#auxilaryCanvasCTX.lineCap = prevSettings.lineCap;
+            this.layers[this.currentLayerIndex].canvasCTX.lineCap = prevSettings.lineCap;
+        });
+
+        var lastPosition;
 
         //Drawing line from stored position to mouse position on
         //auxilary canvas
@@ -406,18 +459,13 @@ class Canvas{
         const handleMouseDown = (event) => {
             lastPosition = this.#extractPosition(event);
 
-            //this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawLinePrev);
-            this.layers[this.currentLayerIndex].addEvent(
-
-            )
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawLinePrev);
         }
 
         //Drawing line in main canvas and removing drawing preview of the line
         //on the auxilary canvas
         const handleMouseUp = (event) => {
             this.#auxilaryCanvasCTX.clearRect(0, 0, this.canvasResolution.x, this.canvasResolution.y);
-
-            this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
 
             const currentPosition = this.#extractPosition(event);
 
@@ -426,11 +474,7 @@ class Canvas{
             this.layers[this.currentLayerIndex].canvasCTX.lineTo(currentPosition.x, currentPosition.y);
             this.layers[this.currentLayerIndex].canvasCTX.stroke();
 
-            this.layers[this.currentLayerIndex].removeEvent(
-                this.layers[this.currentLayerIndex].canvasNode,
-                "mousemove",
-                drawLinePrev
-            )
+            this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousemove", drawLinePrev);
         }
 
         this.layers[this.currentLayerIndex].addModeEvent(
@@ -447,8 +491,19 @@ class Canvas{
     }
 
     drawRectMode(){
-        var lastPosition;
+        //---Proper settings---
+        const prevSettings = {
+            lineCap: this.layers[this.currentLayerIndex].canvasCTX.lineCap
+        }
+
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
+        //------
+
+        this.#modeCleanups.push(() => {
+            this.layers[this.currentLayerIndex].canvasCTX.lineCap = prevSettings.lineCap;
+        });
+
+        var lastPosition;
 
         //Drawing rect from stored position to mouse position on
         //auxilary canvas
@@ -504,8 +559,19 @@ class Canvas{
     }
 
     drawCircleMode(){
-        var lastPosition;
+        //---Proper settings---
+        const prevSettings = {
+            lineCap: this.layers[this.currentLayerIndex].canvasCTX.lineCap
+        }
+
         this.layers[this.currentLayerIndex].canvasCTX.lineCap = "round";
+        //------
+
+        this.#modeCleanups.push(() => {
+            this.layers[this.currentLayerIndex].canvasCTX.lineCap = prevSettings.lineCap;
+        });
+
+        var lastPosition;
 
         //Drawing rect from stored position to mouse position on
         //auxilary canvas
@@ -553,8 +619,73 @@ class Canvas{
             handleMouseUp
         );
     }
+
+    addImage(image){
+        this.layers[this.currentLayerIndex].canvasCTX.drawImage(image, 0, 0);
+    }
+
+    selectMode(){
+        const selectWidth = this.canvasResolution.x * 0.05;
+
+        var lastPosition;
+        this.layers[this.currentLayerIndex].canvasCTX.lineCap = "square";
+        this.layers[this.currentLayerIndex].canvasCTX.lineWidth = selectWidth;
+
+        this.#auxilaryCanvasCTX.setLineDash([selectWidth]);
+
+        //TODO move it outside and merge with drawRectMode function
+        const drawRectPrev = (event) => {
+            const currentPosition = this.#extractPosition(event);
+            const rectSize = {
+                width: currentPosition.x - lastPosition.x,
+                height: currentPosition.y - lastPosition.y
+            }
+
+            this.#auxilaryCanvasCTX.clearRect(0, 0, this.canvasResolution.x, this.canvasResolution.y);
+            this.#auxilaryCanvasCTX.beginPath();
+            this.#auxilaryCanvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
+            this.#auxilaryCanvasCTX.stroke();
+        }
+
+        //Storing initial position and drawing from there to current mouse position
+        const handleMouseDown = (event) => {
+            lastPosition = this.#extractPosition(event);
+
+            this.layers[this.currentLayerIndex].canvasNode.addEventListener("mousemove", drawRectPrev);
+        }
+
+        //Drawing rect in main canvas and removing drawing preview of the rect
+        //on the auxilary canvas
+        const handleMouseUp = (event) => {
+            // this.#auxilaryCanvasCTX.clearRect(0, 0, this.canvasResolution.x, this.canvasResolution.y);
+
+            // const currentPosition = this.#extractPosition(event);
+            // const rectSize = {
+            //     width: currentPosition.x - lastPosition.x,
+            //     height: currentPosition.y - lastPosition.y
+            // }
+
+            // this.layers[this.currentLayerIndex].canvasCTX.beginPath();
+            // this.layers[this.currentLayerIndex].canvasCTX.rect(lastPosition.x, lastPosition.y, rectSize.width, rectSize.height);
+            // this.layers[this.currentLayerIndex].canvasCTX.stroke();
+
+            // this.layers[this.currentLayerIndex].canvasNode.removeEventListener("mousemove", drawRectPrev);
+        }
+
+        this.layers[this.currentLayerIndex].addModeEvent(
+            this.layers[this.currentLayerIndex].canvasNode,
+            "mousedown",
+            handleMouseDown
+        );
+
+        this.layers[this.currentLayerIndex].addModeEvent(
+            this.layers[this.currentLayerIndex].canvasNode,
+            "mouseup",
+            handleMouseUp
+        );
+    }
     
-    bucketFillMode(){
+    bucketFillMode(){        
         function pixelsSimilarity(p1, p2){
             return p1[0] === p2[0] && p1[1] === p2[1] && p1[2] === p2[2] && p1[3] === p2[3];
         }
@@ -666,8 +797,12 @@ class Canvas{
 
                 //Starts listening for next clicks after delay
                 setTimeout(() => {
-                    this.layers[this.currentLayerIndex].canvasNode.addEventListener("click", startAddingText, {once: true});
-                    this.#eventFunctions.click = startAddingText;
+                    this.layers[this.currentLayerIndex].addModeEvent(
+                        this.layers[this.currentLayerIndex].canvasNode,
+                        "click",
+                        startAddingText,
+                        {once: true}
+                    );
                 }, 250);
 
             }, {once: true});
@@ -685,40 +820,16 @@ class Canvas{
         );
     }
 
-    //Remove mode events
+    //Remove mode effects
     clearMode(){
+        for(let cleanup of this.#modeCleanups){
+            cleanup();
+        }
+        this.#modeCleanups = [];
+
         this.layers[this.currentLayerIndex].clearEvents();
     }
-
-    //Returns canvas combined from all layers
-    getMergedLayers(){
-        const resultCanvas = document.createElement("canvas");
-        resultCanvas.width = this.canvasResolution.x;
-        resultCanvas.height = this.canvasResolution.y;
-
-        const resultCanvasCTX = resultCanvas.getContext("2d");
-
-        for(let layer of this.layers){
-            resultCanvasCTX.drawImage(layer.canvasNode, 0, 0);
-        }
-
-        return resultCanvas;
-    }
-
-    //Returns canvas containing one pixel
-    getMergedPixel(x, y){
-        const resultCanvas = document.createElement("canvas");
-        resultCanvas.width = 1;
-        resultCanvas.height = 1;
-        
-        const resultCanvasCTX = resultCanvas.getContext("2d");
-
-        for(let layer of this.layers){
-            resultCanvasCTX.drawImage(layer.canvasNode, x, y, 1, 1, 0, 0, 1, 1);
-        }
-
-        return resultCanvas;
-    }
+    //---
 }
 
 export default Canvas;

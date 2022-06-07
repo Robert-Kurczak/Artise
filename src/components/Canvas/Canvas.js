@@ -221,15 +221,20 @@ class Canvas{
     }
 
     //Returns canvas combined from all layers
-    getMergedLayers(startPosition = {x: 0, y: 0}, size = this.canvasResolution){
+    getLayersSection(startPosition = {x: 0, y: 0}, size = this.canvasResolution, merged=true){
         const resultCanvas = document.createElement("canvas");
         resultCanvas.width = size.x;
         resultCanvas.height = size.y;
 
         const resultCanvasCTX = resultCanvas.getContext("2d");
 
-        for(let layer of this.layers){
-            resultCanvasCTX.drawImage(layer.canvasNode, startPosition.x, startPosition.y, size.x, size.y, 0, 0, size.x, size.y);
+        if(merged){
+            for(let layer of this.layers){
+                resultCanvasCTX.drawImage(layer.canvasNode, startPosition.x, startPosition.y, size.x, size.y, 0, 0, size.x, size.y);
+            }
+        }
+        else{
+            resultCanvasCTX.drawImage(this.layers[this.currentLayerIndex].canvasNode, startPosition.x, startPosition.y, size.x, size.y, 0, 0, size.x, size.y);
         }
 
         return resultCanvas;
@@ -638,7 +643,7 @@ class Canvas{
         //------
 
         //TODO work on single layer
-        const selectionCanvas = this.getMergedLayers(startPoint, size);
+        const selectionCanvas = this.getLayersSection(startPoint, size, false);
 
         selectionCanvas.style = `
             position: absolute;
@@ -646,6 +651,7 @@ class Canvas{
             top: ${startPoint.y - 2}px;
 
             border: 2px dashed black;
+            cursor: move;
         `;
 
         this.canvasWrapper.appendChild(selectionCanvas);
@@ -840,7 +846,7 @@ class Canvas{
 
             var color;
             if(mergedLayers){
-                const imageData = this.getMergedLayers(clickedPosition, {x: 1, y: 1}).getContext("2d").getImageData(0, 0, 1, 1);
+                const imageData = this.getLayersSection(clickedPosition, {x: 1, y: 1}).getContext("2d").getImageData(0, 0, 1, 1);
                 color = this.#getPixel(imageData, 0, 0);
             }
             else{

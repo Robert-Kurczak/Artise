@@ -82,7 +82,7 @@ function App(){
     }, [mainCanvas, saver]);
 
     const downloadImage = useCallback(() => {
-        saver.saveCanvas(mainCanvas.getMergedLayers(), "Artific");
+        saver.saveCanvas(mainCanvas.getLayersSection(), "Artific");
     }, [mainCanvas, saver]);
 
     const saveLocal = useCallback(() => {

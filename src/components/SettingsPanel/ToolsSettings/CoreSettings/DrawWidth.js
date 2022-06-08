@@ -11,7 +11,7 @@ function DrawWidth(props){
 
 	return(
 		<div className="draw_width_setting">
-			<p>{label} size: </p>
+			<p>{label}: </p>
 			<input type="number" min={1} defaultValue={mainCanvas.getDrawWidth()} onChange={updateWidth}></input>
 		</div>
 	);

@@ -9,8 +9,6 @@ import {
 	mdiEraser,
 	mdiEyedropper,
 	mdiFormatColorFill,
-	mdiGradientHorizontal,
-	mdiCursorMove,
 	mdiSelectDrag,
 	mdiMinus,
 	mdiRectangleOutline,
@@ -138,32 +136,6 @@ function Tools() {
 	);
 	/* #endregion */
 
-	/* #region  Gradient */
-	const gradientTool = new Tool(
-		"gradient",
-		mdiGradientHorizontal,
-		() => {
-			//On
-		},
-		() => {
-			//Off
-		}
-	);
-	/* #endregion */
-
-	/* #region  Move */
-	const moveTool = new Tool(
-		"move",
-		mdiCursorMove,
-		() => {
-			mainCanvas.clearMode();
-		},
-		() => {
-			//Off
-		}
-	);
-	/* #endregion */
-
 	/* #region  Select */
 	const selectTool = new Tool(
 		"select",
@@ -241,14 +213,12 @@ function Tools() {
 
 	const tools = [
 		selectTool,
-		moveTool,
 		eyedropperTool,
 		textTool,
 		brushTool,
 		pencilTool,
 		eraserTool,
 		fillTool,
-		gradientTool,
 		lineTool,
 		rectangleTool,
 		circleTool

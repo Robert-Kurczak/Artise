@@ -160,6 +160,93 @@ class Canvas{
         newLayer.canvasCTX.font = prevLayer.canvasCTX.font;
         newLayer.canvasCTX.fillColor = prevLayer.canvasCTX.fillColor;
     }
+
+    #createSelection(position, size){
+        //---Translating points to the top-left origin---
+        var startPoint = position;
+
+        var endPoint = {
+            x: position.x + size.x,
+            y: position.y + size.y
+        }
+
+        if(startPoint.x > endPoint.x){
+            [startPoint.x, endPoint.x] = [endPoint.x, startPoint.x];
+            size.x *= -1;
+        }
+        if(startPoint.y > endPoint.y){
+            [startPoint.y, endPoint.y] = [endPoint.y, startPoint.y];
+            size.y *= -1;
+        }
+        //------
+
+        //TODO work on single layer
+        const selectionCanvas = this.getLayersSection(startPoint, size, this.sampleMerged);
+
+        selectionCanvas.style = `
+            position: absolute;
+            left: ${startPoint.x - 2}px;
+            top: ${startPoint.y - 2}px;
+
+            border: 2px dashed black;
+            cursor: move;
+        `;
+
+        this.canvasWrapper.appendChild(selectionCanvas);
+        
+        //---Clearing canvas at selected place---
+        if(this.sampleMerged){
+            for(let layer of this.layers){
+                layer.canvasCTX.clearRect(startPoint.x, startPoint.y, size.x, size.y);
+            }
+        }
+        else{
+            this.layers[this.currentLayerIndex].canvasCTX.clearRect(startPoint.x, startPoint.y, size.x, size.y);
+        }
+        //------
+
+        var grabOffset = {x: 0, y: 0};
+        const move = (event) => {
+            const currentPosition = this.#extractPosition(event);
+
+            selectionCanvas.style.left = (currentPosition.x - grabOffset.x) + "px";
+            selectionCanvas.style.top = (currentPosition.y - grabOffset.y) + "px";
+        }
+
+        const handleMouseDown = (event) => {
+            const rect = event.target.getBoundingClientRect();
+
+            grabOffset = {
+                x: Math.floor((event.clientX - rect.left) * this.#scaleDivisor),
+                y: Math.floor((event.clientY - rect.top) * this.#scaleDivisor)
+            };
+            
+            this.canvasWrapper.addEventListener("mousemove", move);
+        }
+
+        const handleMouseUp = () => {
+            this.canvasWrapper.removeEventListener("mousemove", move);
+
+            const currentPosition = {
+                x: parseInt(selectionCanvas.style.left),
+                y: parseInt(selectionCanvas.style.top)
+            }
+            
+            this.layers[this.currentLayerIndex].canvasCTX.drawImage(
+                selectionCanvas,
+                currentPosition.x + 2,
+                currentPosition.y + 2
+            );
+
+            selectionCanvas.remove();
+            document.body.removeEventListener("mouseup", handleMouseUp);
+        }
+
+        selectionCanvas.addEventListener("mousedown", handleMouseDown);
+        setTimeout(() => {
+            document.body.addEventListener("mouseup", handleMouseUp);
+        }, 200);
+    }
     //------
 
     //---Public getters---
@@ -242,6 +329,8 @@ class Canvas{
     //------
 
     //---Public setters---
+    sampleMerged = false
+
     setColor(color){
         this.layers[this.currentLayerIndex].canvasCTX.strokeStyle = color;
         this.#auxilaryCanvasCTX.strokeStyle = color;
@@ -622,84 +711,6 @@ class Canvas{
         this.layers[this.currentLayerIndex].canvasCTX.drawImage(image, 0, 0);
     }
 
-    //
-    #createSelection(position, size){
-        //---Translating points to the top-left origin---
-        var startPoint = position;
-
-        var endPoint = {
-            x: position.x + size.x,
-            y: position.y + size.y
-        }
-
-        if(startPoint.x > endPoint.x){
-            [startPoint.x, endPoint.x] = [endPoint.x, startPoint.x];
-            size.x *= -1;
-        }
-        if(startPoint.y > endPoint.y){
-            [startPoint.y, endPoint.y] = [endPoint.y, startPoint.y];
-            size.y *= -1;
-        }
-        //------
-
-        //TODO work on single layer
-        const selectionCanvas = this.getLayersSection(startPoint, size, false);
-
-        selectionCanvas.style = `
-            position: absolute;
-            left: ${startPoint.x - 2}px;
-            top: ${startPoint.y - 2}px;
-
-            border: 2px dashed black;
-            cursor: move;
-        `;
-
-        this.canvasWrapper.appendChild(selectionCanvas);
-        this.layers[this.currentLayerIndex].canvasCTX.clearRect(startPoint.x, startPoint.y, size.x, size.y);
-
-        var grabOffset = {x: 0, y: 0};
-        const move = (event) => {
-            const currentPosition = this.#extractPosition(event);
-
-            selectionCanvas.style.left = (currentPosition.x - grabOffset.x) + "px";
-            selectionCanvas.style.top = (currentPosition.y - grabOffset.y) + "px";
-        }
-
-        const handleMouseDown = (event) => {
-            const rect = event.target.getBoundingClientRect();
-
-            grabOffset = {
-                x: Math.floor((event.clientX - rect.left) * this.#scaleDivisor),
-                y: Math.floor((event.clientY - rect.top) * this.#scaleDivisor)
-            };
-            
-            this.canvasWrapper.addEventListener("mousemove", move);
-        }
-
-        const handleMouseUp = () => {
-            this.canvasWrapper.removeEventListener("mousemove", move);
-
-            const currentPosition = {
-                x: parseInt(selectionCanvas.style.left),
-                y: parseInt(selectionCanvas.style.top)
-            }
-            
-            this.layers[this.currentLayerIndex].canvasCTX.drawImage(
-                selectionCanvas,
-                currentPosition.x + 2,
-                currentPosition.y + 2
-            );
-
-            selectionCanvas.remove();
-            document.body.removeEventListener("mouseup", handleMouseUp);
-        }
-
-        selectionCanvas.addEventListener("mousedown", handleMouseDown);
-        setTimeout(() => {
-            document.body.addEventListener("mouseup", handleMouseUp);
-        }, 200);
-    }
-
     selectMode(){
         const selectWidth = 2 * this.#scaleDivisor;
 
@@ -774,7 +785,7 @@ class Canvas{
             handleMouseUp
         );
     }
-    
+
     bucketFillMode(){        
         function pixelsSimilarity(p1, p2){
             return p1[0] === p2[0] && p1[1] === p2[1] && p1[2] === p2[2] && p1[3] === p2[3];
@@ -840,19 +851,15 @@ class Canvas{
         );
     }
 
-    eyedropperMode(mergedLayers=false){
+    eyedropperMode(){
         const eyedrop = (event) => {
             const clickedPosition = this.#extractPosition(event);
 
+            console.log(this.sampleMerged)
+
             var color;
-            if(mergedLayers){
-                const imageData = this.getLayersSection(clickedPosition, {x: 1, y: 1}).getContext("2d").getImageData(0, 0, 1, 1);
-                color = this.#getPixel(imageData, 0, 0);
-            }
-            else{
-                const imageData = this.layers[this.currentLayerIndex].canvasCTX.getImageData(0, 0, this.canvasResolution.x, this.canvasResolution.y);
-                color = this.#getPixel(imageData, clickedPosition.x, clickedPosition.y);
-            }
+            const imageData = this.getLayersSection(clickedPosition, {x: 1, y: 1}, this.sampleMerged).getContext("2d").getImageData(0, 0, 1, 1);
+            color = this.#getPixel(imageData, 0, 0);
 
             this.setColor(`rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]}`);
         }

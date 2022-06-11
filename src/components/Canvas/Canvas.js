@@ -184,7 +184,6 @@ class Canvas{
         }
         //------
 
-        //TODO work on single layer
         const selectionCanvas = this.getLayersSection(startPoint, size, this.sampleMerged);
 
         selectionCanvas.style = `
@@ -248,6 +247,14 @@ class Canvas{
             selectionCanvas.remove();
             document.body.removeEventListener("mouseup", handleMouseUp);
         }
+
+        //Removing selection with del key
+        document.addEventListener("keydown", (event) => {
+            if(event.key === "Delete"){
+                selectionCanvas.getContext("2d").clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+                handleMouseUp();
+            }
+        }, {once: true});
 
         selectionCanvas.addEventListener("mousedown", handleMouseDown);
         setTimeout(() => {

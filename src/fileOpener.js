@@ -27,22 +27,6 @@ class fileOpener{
                         imageInstance.onload = () => {
                             imageCallback(imageInstance);
                         };
-        
-                        // imageInstance.onload = () => {
-                        //     var img = new fabric.Image(imageInstance);
-    
-                        //     //Creating canvas with image
-                        //     if(canvas === ""){
-                        //         setImage(img);
-                        //         showCanvas(true);
-                        //     }
-                        //     else{
-                        //         //Adding image to existing canvas
-                        //         img.scaleToWidth(canvas.width);
-        
-                        //         canvas.add(img).setActiveObject(img).renderAll();
-                        //     }
-                        // }
                     };
     
                     this.#reader.readAsDataURL(this.#uploader.files[0]);

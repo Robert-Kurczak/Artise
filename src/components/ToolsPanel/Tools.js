@@ -5,6 +5,7 @@ import Icon from "./Icon";
 
 import {
 	mdiBrush,
+	mdiCrop,
 	mdiPencil,
 	mdiEraser,
 	mdiEyedropper,
@@ -62,6 +63,21 @@ function Tools() {
 		//Enable
 		() => {
 			mainCanvas.drawMode("brush");
+		},
+		//Disable
+		() => {
+			mainCanvas.clearMode();
+		}
+	);
+	/* #endregion */
+
+	/* #region  Crop */
+	const cropTool = new Tool(
+		"crop",
+		mdiCrop,
+		//Enable
+		() => {
+			mainCanvas.cropMode();
 		},
 		//Disable
 		() => {
@@ -181,7 +197,7 @@ function Tools() {
 	);
 	/* #endregion */
 
-	/* #region Circle */
+	/* #region  Circle */
 	const circleTool = new Tool(
 		"circle",
 		mdiCircleOutline,
@@ -213,6 +229,7 @@ function Tools() {
 
 	const tools = [
 		selectTool,
+		cropTool,
 		eyedropperTool,
 		textTool,
 		brushTool,

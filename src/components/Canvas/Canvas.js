@@ -18,6 +18,8 @@ class Canvas{
     //Holder for inputing text before actualy drawing it on canvas
     #textInputHolder;
 
+    #cropSlidersHolder;
+
     //Array that stores functions for cleaning up modes side effects
     //Some modes can use other modes therefore it have to be an array instead of function
     //clearMode() executes each function and clear this array
@@ -59,10 +61,6 @@ class Canvas{
     initNew(width, height){
         this.canvasResolution = {x: width, y: height};
 
-        //---Creating auxilary canvas---
-        this.#createAuxilaryCanvas(width, height);
-        //------
-
         //---Creating main layer---
         this.addLayer();
 
@@ -77,6 +75,12 @@ class Canvas{
 
         //Set wrapper dimensions
         this.setScale();
+
+        //---Creating auxilary canvas---
+        this.#createAuxilaryCanvas(width, height);
+        //------
+
+        this.#createCropSliders();
         
         //Get wrapper position on screen
         this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
@@ -185,8 +189,11 @@ class Canvas{
 
         selectionCanvas.style = `
             position: absolute;
-            left: ${startPoint.x - 2}px;
-            top: ${startPoint.y - 2}px;
+            left: ${(startPoint.x - 2) / this.#scaleDivisor}px;
+            top: ${(startPoint.y - 2) / this.#scaleDivisor}px;
+
+            width: ${selectionCanvas.width / this.#scaleDivisor}px;
+            height: ${selectionCanvas.height / this.#scaleDivisor}px;
 
             border: 2px dashed black;
             cursor: move;
@@ -209,16 +216,16 @@ class Canvas{
         const move = (event) => {
             const currentPosition = this.#extractPosition(event);
 
-            selectionCanvas.style.left = (currentPosition.x - grabOffset.x) + "px";
-            selectionCanvas.style.top = (currentPosition.y - grabOffset.y) + "px";
+            selectionCanvas.style.left = (currentPosition.x / this.#scaleDivisor - grabOffset.x) + "px";
+            selectionCanvas.style.top = (currentPosition.y / this.#scaleDivisor - grabOffset.y) + "px";
         }
 
         const handleMouseDown = (event) => {
             const rect = event.target.getBoundingClientRect();
 
             grabOffset = {
-                x: Math.floor((event.clientX - rect.left) * this.#scaleDivisor),
-                y: Math.floor((event.clientY - rect.top) * this.#scaleDivisor)
+                x: Math.floor(event.clientX - rect.left),
+                y: Math.floor(event.clientY - rect.top)
             };
             
             this.canvasWrapper.addEventListener("mousemove", move);
@@ -234,8 +241,8 @@ class Canvas{
             
             this.layers[this.currentLayerIndex].canvasCTX.drawImage(
                 selectionCanvas,
-                currentPosition.x + 2,
-                currentPosition.y + 2
+                (currentPosition.x + 2) * this.#scaleDivisor,
+                (currentPosition.y + 2) * this.#scaleDivisor
             );
 
             selectionCanvas.remove();
@@ -246,6 +253,193 @@ class Canvas{
         setTimeout(() => {
             document.body.addEventListener("mouseup", handleMouseUp);
         }, 200);
+    }
+
+    #createCropSliders(){
+        const lineWidth = 30;
+        const lineThickness = 5;
+
+        //---Parent---
+        const slidersParent = document.createElement("div");
+        slidersParent.style = `
+            display: none;
+
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+
+            z-index: 999;
+
+            width: ${this.canvasResolution.x / this.#scaleDivisor}px;
+            height: ${this.canvasResolution.y / this.#scaleDivisor}px;
+            overflow: hidden;
+
+            border: 1px solid black;
+            box-shadow: rgba(0, 0, 0, 0.6) 0px 0px 0px ${this.canvasResolution.x / this.#scaleDivisor}px;
+        `;
+
+        const draggableArea = document.createElement("div");
+        draggableArea.style = `
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            width: 75%;
+            height: 75%;
+
+            transform: translate(-50%, -50%);
+
+            cursor: move;
+        `;
+
+        slidersParent.appendChild(draggableArea);
+
+        var grabOffset = {x: 0, y: 0};
+        const moveParent = (event) => {
+            const position = this.#extractPosition(event);
+            
+            slidersParent.style.left = (position.x / this.#scaleDivisor - grabOffset.x) + "px";
+            slidersParent.style.top = (position.y / this.#scaleDivisor - grabOffset.y) + "px";
+        }
+
+        const handleMouseDown = (event) => {
+            const rect = slidersParent.getBoundingClientRect();
+            
+            grabOffset = {
+                x: Math.floor(event.clientX - rect.left),
+                y: Math.floor(event.clientY - rect.top)
+            };
+
+            this.canvasWrapper.addEventListener("mousemove", moveParent);
+        }
+
+        const handleMouseUp = () => {
+            this.canvasWrapper.removeEventListener("mousemove", moveParent);
+        }
+
+        draggableArea.addEventListener("mousedown", handleMouseDown);
+        draggableArea.addEventListener("mouseup", handleMouseUp);
+        //------
+
+        //---Sliders---
+        const sliders = [
+            //Left
+            {
+                style: `
+                    position: absolute;
+
+                    left: 0px;
+                    top: 50%;
+                    transform: translateY(-50%);
+
+                    width: ${lineThickness}px;
+                    height: ${lineWidth}px;
+
+                    background-color: black;
+                    cursor: e-resize;
+                `,
+                slideHandle: (event) => {
+                    const moveX = event.movementX;
+
+                    slidersParent.style.width = parseInt(slidersParent.style.width.slice(0, -2)) - moveX + "px";
+                    slidersParent.style.left = parseInt(slidersParent.style.left.slice(0, -2)) + moveX + "px";
+                }
+            },
+
+            //Top
+            {
+                style: `
+                    position: absolute;
+
+                    left: 50%;
+                    top: 0px;
+                    transform: translateX(-50%);
+
+                    width: ${lineWidth}px;
+                    height: ${lineThickness}px;
+
+                    background-color: black;
+                    cursor: n-resize;
+                `,
+                slideHandle: (event) => {
+                    const moveY = event.movementY;
+
+                    slidersParent.style.height = parseInt(slidersParent.style.height.slice(0, -2)) - moveY + "px";
+                    slidersParent.style.top = parseInt(slidersParent.style.top.slice(0, -2)) + moveY + "px";
+                }
+            },
+
+            //Right
+            {
+                style: `
+                    position: absolute;
+
+                    right: 0px;
+                    top: 50%;
+                    transform: translateY(-50%);
+
+                    width: ${lineThickness}px;
+                    height: ${lineWidth}px;
+
+                    background-color: black;
+                    cursor: e-resize;
+                `,
+                slideHandle: (event) => {
+                    const moveX = event.movementX;
+
+                    slidersParent.style.width = parseInt(slidersParent.style.width.slice(0, -2)) + moveX + "px";
+                    slidersParent.style.right = parseInt(slidersParent.style.left.slice(0, -2)) + moveX + "px";
+                }
+            },
+
+            //Bottom
+            {
+                style: `
+                    position: absolute;
+
+                    left: 50%;
+                    bottom: 0px;
+                    transform: translateX(-50%);
+
+                    width: ${lineWidth}px;
+                    height: ${lineThickness}px;
+
+                    background-color: black;
+                    cursor: n-resize;
+                `,
+                slideHandle: (event) => {
+                    const moveY = event.movementY;
+
+                    slidersParent.style.height = parseInt(slidersParent.style.height.slice(0, -2)) + moveY + "px";
+                    slidersParent.style.bottom = parseInt(slidersParent.style.bottom.slice(0, -2)) + moveY + "px";
+                }
+            }
+        ];
+        //------
+
+        for(let slider of sliders){
+            const node = document.createElement("div");
+            node.style = slider.style;
+
+            const handleMouseDown = () => {
+                this.canvasWrapper.addEventListener("mousemove", slider.slideHandle);
+            }
+
+            const handleMouseUp = () => {
+                this.canvasWrapper.removeEventListener("mousemove", slider.slideHandle);
+            }
+
+            node.addEventListener("mousedown", handleMouseDown);
+            this.canvasWrapper.addEventListener("mouseup", handleMouseUp);
+
+            slidersParent.appendChild(node);
+        }
+
+        this.canvasWrapper.appendChild(slidersParent);
+        this.#cropSlidersHolder = slidersParent;
     }
     //------
 
@@ -869,6 +1063,14 @@ class Canvas{
             "click",
             eyedrop
         );
+    }
+
+    cropMode(){
+        this.#cropSlidersHolder.style.display = "block";
+
+        this.#modeCleanups.push(() => {
+            this.#cropSlidersHolder.style.display = "none";
+        });
     }
 
     //TODO better calculating text position based on textarea

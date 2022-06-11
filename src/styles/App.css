@@ -66,4 +66,6 @@ body{
 
     background-image: url("../Images/alpha_pattern.png");
     background-size: 16px;
+
+    overflow: hidden;
 }

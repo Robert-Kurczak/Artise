@@ -81,9 +81,6 @@ class Canvas{
         //------
 
         this.#createCropSliders();
-        
-        //Get wrapper position on screen
-        this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
     }
 
     initFromJSON(jsonObject){
@@ -329,6 +326,7 @@ class Canvas{
 
         draggableArea.addEventListener("mousedown", handleMouseDown);
         draggableArea.addEventListener("mouseup", handleMouseUp);
+
         //------
 
         //---Sliders---
@@ -398,7 +396,6 @@ class Canvas{
                     const moveX = event.movementX;
 
                     slidersParent.style.width = parseInt(slidersParent.style.width.slice(0, -2)) + moveX + "px";
-                    slidersParent.style.right = parseInt(slidersParent.style.left.slice(0, -2)) + moveX + "px";
                 }
             },
 
@@ -421,7 +418,6 @@ class Canvas{
                     const moveY = event.movementY;
 
                     slidersParent.style.height = parseInt(slidersParent.style.height.slice(0, -2)) + moveY + "px";
-                    slidersParent.style.bottom = parseInt(slidersParent.style.bottom.slice(0, -2)) + moveY + "px";
                 }
             }
         ];
@@ -509,7 +505,7 @@ class Canvas{
     }
 
     //Returns canvas combined from all layers
-    getLayersSection(startPosition = {x: 0, y: 0}, size = this.canvasResolution, merged=true){
+    getLayersSection(startPosition = {x: 0, y: 0}, size = this.canvasResolution, merged=true, layerIndex=this.currentLayerIndex){
         const resultCanvas = document.createElement("canvas");
         resultCanvas.width = size.x;
         resultCanvas.height = size.y;
@@ -522,7 +518,7 @@ class Canvas{
             }
         }
         else{
-            resultCanvasCTX.drawImage(this.layers[this.currentLayerIndex].canvasNode, startPosition.x, startPosition.y, size.x, size.y, 0, 0, size.x, size.y);
+            resultCanvasCTX.drawImage(this.layers[layerIndex].canvasNode, startPosition.x, startPosition.y, size.x, size.y, 0, 0, size.x, size.y);
         }
 
         return resultCanvas;
@@ -544,15 +540,31 @@ class Canvas{
     //Compute scale divisor so the canvas can properly fit on screen
     //while maintaining it's resolution
     setScale(){
-        if(this.canvasResolution.x > this.#MAX_WIDTH && this.canvasResolution.x < this.canvasResolution.y){
+        if(this.canvasResolution.y > this.#MAX_HEIGHT){
+            this.#scaleDivisor = this.canvasResolution.y / this.#MAX_HEIGHT;
+        }
+        else if(this.canvasResolution.x > this.#MAX_WIDTH){
             this.#scaleDivisor = this.canvasResolution.x / this.#MAX_WIDTH;
         }
-        else if(this.canvasResolution.y > this.#MAX_HEIGHT){
-            this.#scaleDivisor = this.canvasResolution.y / this.#MAX_HEIGHT;
+        //TODO better conditions
+        else if(this.canvasResolution.y > this.#MAX_HEIGHT && this.canvasResolution.x > this.#MAX_WIDTH){
+            if(this.canvasResolution.y > this.canvasResolution.x){
+                this.#scaleDivisor = this.canvasResolution.y / this.#MAX_HEIGHT;
+            }
+            else{
+                this.#scaleDivisor = this.canvasResolution.x / this.#MAX_WIDTH;
+            }
+        }
+
+        else{
+            this.#scaleDivisor = 1;
         }
 
         this.canvasWrapper.style.width = `${this.canvasResolution.x / this.#scaleDivisor}px`;
         this.canvasWrapper.style.height = `${this.canvasResolution.y / this.#scaleDivisor}px`;
+
+        //Get wrapper position on screen
+        this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
     }
 
     setFontSize(size){
@@ -1074,6 +1086,43 @@ class Canvas{
 
     cropMode(){
         this.#cropSlidersHolder.style.display = "block";
+
+        const confirmCrop = () => {
+            const startPosition = {
+                x: parseInt(this.#cropSlidersHolder.style.left.slice(0, -2)) * this.#scaleDivisor,
+                y: parseInt(this.#cropSlidersHolder.style.top.slice(0, -2)) * this.#scaleDivisor
+            }
+
+            this.canvasResolution = {
+                x: parseInt(this.#cropSlidersHolder.style.width.slice(0, -2)) * this.#scaleDivisor,
+                y: parseInt(this.#cropSlidersHolder.style.height.slice(0, -2)) * this.#scaleDivisor
+            }
+
+            const initialLayersLength = this.layers.length;
+            for(let i = 0; i < initialLayersLength; i++){
+                const croppedPart = this.getLayersSection(startPosition, this.canvasResolution, false, 0);
+
+                //Adding cropped version of layer at the end of current array
+                this.addLayer();
+                this.layers[initialLayersLength].canvasCTX.drawImage(croppedPart, 0, 0);
+
+                //Removing uncropped layer
+                this.layers[0].canvasNode.remove();
+                this.layers.splice(0, 1);
+            }
+
+            //Resizing canvas
+            this.setScale();
+            
+            this.#auxilaryCanvas.remove();
+            this.#createAuxilaryCanvas(this.canvasResolution.x, this.canvasResolution.y);
+            this.#cropSlidersHolder.remove();
+            this.#createCropSliders();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if(event.key === "Enter") confirmCrop();
+        }, {once: true})
 
         this.#modeCleanups.push(() => {
             this.#cropSlidersHolder.style.display = "none";

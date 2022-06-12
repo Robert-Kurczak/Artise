@@ -281,7 +281,7 @@ class Canvas{
             overflow: hidden;
 
             border: 1px solid black;
-            box-shadow: rgba(0, 0, 0, 0.6) 0px 0px 0px ${this.canvasResolution.x / this.#scaleDivisor}px;
+            box-shadow: 0px 0px 0px ${Math.max(this.canvasResolution.x, this.canvasResolution.y) * 4}px rgba(0, 0, 0, 0.6);
         `;
 
         const draggableArea = document.createElement("div");
@@ -436,7 +436,7 @@ class Canvas{
             }
 
             node.addEventListener("mousedown", handleMouseDown);
-            this.canvasWrapper.addEventListener("mouseup", handleMouseUp);
+            slidersParent.addEventListener("mouseup", handleMouseUp);
 
             slidersParent.appendChild(node);
         }
@@ -1087,7 +1087,19 @@ class Canvas{
     cropMode(){
         this.#cropSlidersHolder.style.display = "block";
 
-        const confirmCrop = () => {
+        const resetSlidersStyle = () => {
+            this.#cropSlidersHolder.style.width = this.canvasResolution.x / this.#scaleDivisor + "px";
+            this.#cropSlidersHolder.style.height = this.canvasResolution.y / this.#scaleDivisor + "px";
+            this.#cropSlidersHolder.style.top = "0px";
+            this.#cropSlidersHolder.style.left = "0px";
+            this.#cropSlidersHolder.style.boxShadow = `0 0 0 ${Math.max(this.canvasResolution.x, this.canvasResolution.y) * 4}px rgba(0, 0, 0, 0.6)`;
+        }
+
+        resetSlidersStyle();
+
+        const confirmCrop = (event) => {
+            if(event.key !== "Enter") return;
+
             const startPosition = {
                 x: parseInt(this.#cropSlidersHolder.style.left.slice(0, -2)) * this.#scaleDivisor,
                 y: parseInt(this.#cropSlidersHolder.style.top.slice(0, -2)) * this.#scaleDivisor
@@ -1099,6 +1111,7 @@ class Canvas{
             }
 
             const initialLayersLength = this.layers.length;
+            const initialLayerIndex = this.currentLayerIndex;
             for(let i = 0; i < initialLayersLength; i++){
                 const croppedPart = this.getLayersSection(startPosition, this.canvasResolution, false, 0);
 
@@ -1106,25 +1119,31 @@ class Canvas{
                 this.addLayer();
                 this.layers[initialLayersLength].canvasCTX.drawImage(croppedPart, 0, 0);
 
+                //Making cropped version of active layer actually active
+                if(i === initialLayerIndex) this.changeLayer(initialLayersLength);
+
                 //Removing uncropped layer
-                this.layers[0].canvasNode.remove();
-                this.layers.splice(0, 1);
+                this.removeLayer(0);
             }
 
-            //Resizing canvas
+            //changeLayer and removeLayer have influence on currentLayerIndex
+            //therefore original one have to be restored
+            this.currentLayerIndex = initialLayerIndex;
+
+            //---Resizing canvas---
             this.setScale();
-            
-            this.#auxilaryCanvas.remove();
-            this.#createAuxilaryCanvas(this.canvasResolution.x, this.canvasResolution.y);
-            this.#cropSlidersHolder.remove();
-            this.#createCropSliders();
+
+            this.#auxilaryCanvas.width = this.canvasResolution.x;
+            this.#auxilaryCanvas.height = this.canvasResolution.y;
+            //------
+
+            resetSlidersStyle();
         }
 
-        document.addEventListener("keydown", (event) => {
-            if(event.key === "Enter") confirmCrop();
-        }, {once: true})
+        document.addEventListener("keydown", confirmCrop);
 
         this.#modeCleanups.push(() => {
+            document.removeEventListener("keydown", confirmCrop);
             this.#cropSlidersHolder.style.display = "none";
         });
     }

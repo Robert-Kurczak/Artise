@@ -1,0 +1,14 @@
+.layer_move{
+    display: flex;
+    flex-direction: column;
+    width: 10%;
+    align-items: center;
+}
+
+.layer_move span{
+    /* padding: 10px; */
+}
+
+.layer_move span:hover{
+    background-color: red;
+}

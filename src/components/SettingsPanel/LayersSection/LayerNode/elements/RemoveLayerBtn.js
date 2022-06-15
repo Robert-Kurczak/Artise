@@ -1,11 +1,11 @@
-import "../../../../styles/RemoveLayerBtn.css"
+import "../../../../../styles/RemoveLayerBtn.css"
 
 function RemoveLayerBtn(props){
     const { removeLayer, rerenderNodes } = props;
-    
+
     const removeThisLayer = (event) => {
         event.stopPropagation();
-        
+
         removeLayer();
 
         rerenderNodes();

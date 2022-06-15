@@ -1,12 +1,14 @@
 import "../../../../styles/LayerNode.css"
 
-import LayerColor from "./LayerColor";
-import RemoveLayerBtn from "./RemoveLayerBtn";
+import LayerColor from "./elements/LayerColor";
+import MoveLayerBtn from "./elements/MoveLayerBtn";
+import RemoveLayerBtn from "./elements/RemoveLayerBtn";
 
 function LayerNode(props){
     const {
         active,
         layerIndex,
+        layerName,
 
         hideLayer,
         showLayer,
@@ -14,6 +16,8 @@ function LayerNode(props){
         changeLayer,
 
         removeLayer,
+        moveLayer,
+
         rerenderNodes
     } = props;
 
@@ -33,7 +37,12 @@ function LayerNode(props){
                 hideLayer={hideLayer}
             />
 
-            <p>Layer {layerIndex}</p>
+            <p>Layer {layerName}</p>
+
+            <MoveLayerBtn
+                moveLayer={moveLayer}
+                rerenderNodes={rerenderNodes}
+            />
             
             <RemoveLayerBtn
                 active={active}

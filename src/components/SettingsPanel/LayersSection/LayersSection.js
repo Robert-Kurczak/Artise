@@ -24,14 +24,17 @@ function LayersSection(){
                 active={index === mainCanvas.currentLayerIndex}
 
                 layerIndex={index}
+                layerName={mainCanvas.layers[index].name}
                 
                 hideLayer={() => {mainCanvas.hideLayer(index)}}
                 showLayer={() => {mainCanvas.showLayer(index)}}
                 
                 changeLayer={() => {mainCanvas.changeLayer(index)}}
 
-                rerenderNodes={rerenderNodes}
                 removeLayer={() => {mainCanvas.removeLayer(index)}}
+                moveLayer={(direction) => {mainCanvas.moveLayer(index, direction)}}
+
+                rerenderNodes={rerenderNodes}
             />
         )
     }

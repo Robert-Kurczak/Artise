@@ -32,6 +32,7 @@ class Canvas{
     
     canvasResolution = {x: 0, y: 0};
     
+    #lastLayerName = 0;
     layers = [];
 
     //---Construct section---
@@ -56,6 +57,8 @@ class Canvas{
         window.addEventListener("resize", () => {
             this.#canvasBoundingRect = this.canvasWrapper.getBoundingClientRect();
         });
+
+        window.mainCanvas = this;
     }
 
     initNew(width, height){
@@ -597,7 +600,9 @@ class Canvas{
 
     //---Layers methods---
     addLayer(){
-        const layer = new Layer(this.canvasResolution.x, this.canvasResolution.y);
+        const layer = new Layer(this.canvasResolution.x, this.canvasResolution.y, this.#lastLayerName);
+        this.#lastLayerName++;
+
         this.layers.push(layer);
         this.canvasWrapper.appendChild(layer.canvasNode);
     }
@@ -635,11 +640,30 @@ class Canvas{
     }
 
     hideLayer(layerIndex){
-        this.layers[layerIndex].canvasNode.style.opacity = 0;
+        // this.layers[layerIndex].canvasNode.style.opacity = 0;
+        this.layers[layerIndex].hide();
     }
 
     showLayer(layerIndex){
-        this.layers[layerIndex].canvasNode.style.opacity = 1;
+        // this.layers[layerIndex].canvasNode.style.opacity = 1;
+        this.layers[layerIndex].show();
+    }
+
+    moveLayer(layerIndex, distance){
+        const destinationIndex = layerIndex + distance;
+
+        if(destinationIndex > this.layers.length - 1 || destinationIndex < 0) return
+
+        const sourceLayer = this.layers[layerIndex];
+        var destinationLayer = distance > 0 ? this.layers[destinationIndex].canvasNode.nextSibling : this.layers[destinationIndex].canvasNode;
+        
+        this.canvasWrapper.insertBefore(sourceLayer.canvasNode, destinationLayer);
+
+        this.layers.splice(layerIndex, 1);
+        this.layers.splice(destinationIndex, 0, sourceLayer);
+
+        if(layerIndex === this.currentLayerIndex) this.currentLayerIndex += distance;
+        else if(layerIndex + distance === this.currentLayerIndex) this.currentLayerIndex -= distance;
     }
     //------
 

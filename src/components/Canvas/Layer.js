@@ -22,16 +22,30 @@ class Event{
 class Layer{
     canvasNode;
     canvasCTX;
+    hidden = false;
 
     modeEvents = [];
 
-    constructor(width, height){
+    constructor(width, height, name){
+        this.name = name;
+        
         this.canvasNode = document.createElement("canvas");
         this.canvasNode.width = width;
         this.canvasNode.height = height;
+        this.canvasNode.id = "layer " + name;
         this.canvasNode.style = "position: absolute; pointer-events: none; width: 100%";
 
         this.canvasCTX = this.canvasNode.getContext("2d");
+    }
+
+    hide(){
+        this.canvasNode.style.opacity = 0;
+        this.hidden = true;
+    }
+
+    show(){
+        this.canvasNode.style.opacity = 1;
+        this.hidden = false;
     }
 
     addModeEvent(eventHost, eventType, eventHandler, options={}){

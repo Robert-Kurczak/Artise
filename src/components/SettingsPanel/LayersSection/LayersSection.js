@@ -20,11 +20,12 @@ function LayersSection(){
         nodes.push(
             <LayerNode
                 key={index}
-
-                active={index === mainCanvas.currentLayerIndex}
-
+                
                 layerIndex={index}
                 layerName={mainCanvas.layers[index].name}
+
+                active={index === mainCanvas.currentLayerIndex}
+                hidden={mainCanvas.layers[index].hidden}
                 
                 hideLayer={() => {mainCanvas.hideLayer(index)}}
                 showLayer={() => {mainCanvas.showLayer(index)}}

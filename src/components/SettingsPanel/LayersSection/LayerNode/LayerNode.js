@@ -6,9 +6,11 @@ import RemoveLayerBtn from "./elements/RemoveLayerBtn";
 
 function LayerNode(props){
     const {
-        active,
         layerIndex,
         layerName,
+
+        active,
+        hidden,
 
         hideLayer,
         showLayer,
@@ -33,8 +35,10 @@ function LayerNode(props){
     return(
         <div className="layer_node" onClick={changeLayerToThis} style={style}>
             <LayerColor
+                hidden={hidden}
                 showLayer={showLayer}
                 hideLayer={hideLayer}
+                rerenderNodes={rerenderNodes}
             />
 
             <p>Layer {layerName}</p>

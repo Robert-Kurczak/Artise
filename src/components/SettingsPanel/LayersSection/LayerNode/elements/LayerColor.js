@@ -1,6 +1,6 @@
 import "../../../../../styles/LayerColor.css"
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 //Max value - 240
 //Min value - 100
@@ -9,29 +9,29 @@ function randColorValue(){
 }
 
 function LayerColor(props){
-    const { hideLayer, showLayer } = props;
+    const { hidden, hideLayer, showLayer, rerenderNodes } = props;
 
-    const [opacity, setOpacity] = useState(1);
     const randRGB = useRef(`rgb(${randColorValue()}, ${randColorValue()}, ${randColorValue()})`);
 
     function toggleLayer(event){
         event.stopPropagation();
 
-        if(opacity === 1){
-            setOpacity(0.2);
+        if(!hidden){
             hideLayer();
+            
         }
         else{
-            setOpacity(1);
             showLayer();
         }
+
+        rerenderNodes();
     }
 
     return(
         <div
             onClick={(event) => toggleLayer(event)}
             className="layer_color"
-            style={{backgroundColor: randRGB.current, opacity: opacity}}
+            style={{backgroundColor: randRGB.current, opacity: hidden ? 0.2 : 1}}
         />
     );
 }

@@ -6,5 +6,5 @@
 }
 
 .layer_remove:hover{
-    background-color: #141414;
+    transform: scale(1.1);
 }

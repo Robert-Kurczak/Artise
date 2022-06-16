@@ -1142,6 +1142,7 @@ class Canvas{
                 //Adding cropped version of layer at the end of current array
                 this.addLayer();
                 this.layers[initialLayersLength].canvasCTX.drawImage(croppedPart, 0, 0);
+                this.layers[initialLayersLength].name = this.layers[0].name;
 
                 //Making cropped version of active layer actually active
                 if(i === initialLayerIndex) this.changeLayer(initialLayersLength);

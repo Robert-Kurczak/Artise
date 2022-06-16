@@ -1,5 +1,2 @@
-draggable layers nodes
 better pencil
 pass mainCanvas instead of context
-
-tools and document creators rerender whole app

@@ -5,7 +5,7 @@ function DefaultScreen(){
     return(
         <div className="default_screen">
             <img src={backgroundImg} alt="pallete icon"/>
-            <p>Artific</p>
+            <p>Artise</p>
         </div>
     );
 }

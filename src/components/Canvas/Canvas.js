@@ -463,10 +463,6 @@ class Canvas{
         });
     }
 
-    getColor(){
-        return this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
-    }
-
     //TODO read from input holder?
     getFontSize(scaled=false){
         const currentFont = this.layers[this.currentLayerIndex].canvasCTX.font;
@@ -488,13 +484,17 @@ class Canvas{
         return this.layers[this.currentLayerIndex].canvasCTX.fillStyle;
     }
 
+    getColor(){
+        return this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
+    }
+
     //TODO better validation
     getColorRGBA(){
         var currentColor = this.layers[this.currentLayerIndex].canvasCTX.strokeStyle;
 
         //rgba(r, g, b, a) to [r, g, b, a]
         if(currentColor[0] === "r"){
-            return currentColor.substr(5).slice(0, -1).split(",").map((str) => parseInt(str));
+            return currentColor.substr(5).slice(0, -1).split(",").map((str) => parseFloat(str));
         }
         //#ff0044 to [255, 0, 44, 255]
         else{
@@ -1055,6 +1055,8 @@ class Canvas{
 
         const fill = (event) => {
             const fillColor = this.getColorRGBA();
+            fillColor[3] *= 255;
+
             const imageData = this.layers[this.currentLayerIndex].canvasCTX.getImageData(0, 0, this.canvasResolution.x, this.canvasResolution.y);
             const clickedPosition = this.#extractPosition(event);
             const clickedColor = this.#getPixel(imageData, clickedPosition.x, clickedPosition.y);

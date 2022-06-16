@@ -162,6 +162,9 @@ function App(){
 
             {showDocumentEditor &&
                 <DocumentEditor
+                    currentWidth={mainCanvas.canvasResolution.x}
+                    currentHeight={mainCanvas.canvasResolution.y}
+                    resize={mainCanvas.resize.bind(mainCanvas)}
                     hideCreator={() => {setShowDocumentEditor(false)}}
                 />
             }

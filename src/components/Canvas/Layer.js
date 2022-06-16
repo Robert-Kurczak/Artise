@@ -48,6 +48,11 @@ class Layer{
         this.hidden = false;
     }
 
+    setSize(size){
+        this.canvasNode.width = size.x;
+        this.canvasNode.height = size.y;
+    }
+
     addModeEvent(eventHost, eventType, eventHandler, options={}){
         this.modeEvents.push(new Event(eventHost, eventType, eventHandler, options));
     }

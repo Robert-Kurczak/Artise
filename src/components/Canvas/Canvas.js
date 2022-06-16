@@ -640,12 +640,10 @@ class Canvas{
     }
 
     hideLayer(layerIndex){
-        // this.layers[layerIndex].canvasNode.style.opacity = 0;
         this.layers[layerIndex].hide();
     }
 
     showLayer(layerIndex){
-        // this.layers[layerIndex].canvasNode.style.opacity = 1;
         this.layers[layerIndex].show();
     }
 
@@ -666,6 +664,33 @@ class Canvas{
         else if(layerIndex + distance === this.currentLayerIndex) this.currentLayerIndex -= distance;
     }
     //------
+
+    resize(size){
+        this.canvasResolution = size;
+
+        const initialLayersLength = this.layers.length;
+        const initialLayerIndex = this.currentLayerIndex;
+
+        for(let i = 0; i < initialLayersLength; i++){
+            const image = this.getLayersSection({x: 0, y: 0}, size, false, 0);
+
+            //Adding cropped version of layer at the end of current array
+            this.addLayer();
+            this.layers[initialLayersLength].canvasCTX.drawImage(image, 0, 0);
+            this.layers[initialLayersLength].name = this.layers[0].name;
+
+            //Making cropped version of active layer actually active
+            if(i === initialLayerIndex) this.changeLayer(initialLayersLength);
+
+            //Removing uncropped layer
+            this.removeLayer(0);
+        }
+
+        this.setScale();
+
+        this.#auxilaryCanvas.width = this.canvasResolution.x;
+        this.#auxilaryCanvas.height = this.canvasResolution.y;
+    }
 
     //---Modes---
     drawMode(mode){
@@ -1125,19 +1150,27 @@ class Canvas{
             if(event.key !== "Enter") return;
 
             const startPosition = {
-                x: parseInt(this.#cropSlidersHolder.style.left.slice(0, -2)) * this.#scaleDivisor,
-                y: parseInt(this.#cropSlidersHolder.style.top.slice(0, -2)) * this.#scaleDivisor
-            }
+                x: (parseInt(this.#cropSlidersHolder.style.left.slice(0, -2))) * this.#scaleDivisor,
+                y: (parseInt(this.#cropSlidersHolder.style.top.slice(0, -2))) * this.#scaleDivisor
+            };
 
+            //Offset due to cropSliders board thickness (1px)
             this.canvasResolution = {
                 x: parseInt(this.#cropSlidersHolder.style.width.slice(0, -2)) * this.#scaleDivisor,
                 y: parseInt(this.#cropSlidersHolder.style.height.slice(0, -2)) * this.#scaleDivisor
-            }
+            };
+
+            //Making sure that cropped image isn't for example 1px narrower than actual resolution
+            const cropSize = {
+                x: this.canvasResolution.x + 5,
+                y: this.canvasResolution.y + 5
+            };
 
             const initialLayersLength = this.layers.length;
             const initialLayerIndex = this.currentLayerIndex;
+
             for(let i = 0; i < initialLayersLength; i++){
-                const croppedPart = this.getLayersSection(startPosition, this.canvasResolution, false, 0);
+                const croppedPart = this.getLayersSection(startPosition, cropSize, false, 0);
 
                 //Adding cropped version of layer at the end of current array
                 this.addLayer();
